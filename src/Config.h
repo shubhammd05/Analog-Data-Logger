@@ -1,3 +1,3 @@
-#define SWITCH 5
-#define LEDG 19
-#define LEDR 23
+#define SWITCH 15
+#define LEDG TX2
+#define LEDR RX2

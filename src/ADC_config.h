@@ -30,7 +30,7 @@ class ADC{
         }
     }
 
-    int Read(){
+    uint16_t Read(){
         analogSetWidth(width);
         return analogRead(pin);
     }
