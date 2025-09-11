@@ -38,12 +38,12 @@ void setup() {
     while (1) delay(10);
   }
 
-  if (rtc.lostPower()) {
+  /*if (rtc.lostPower()) {
     Serial.println("RTC lost power, let's set the time!");
     
    //rtc.adjust(DateTime(F(_DATE), F(TIME_)));
     
-  }
+  }*/
 
  if (!SD.begin(SD_CS, SPI)) {
     Serial.println("Card Mount Failed!");
@@ -67,7 +67,7 @@ void loop() {
     Second = now.second();
     C1Data = C1.Read(); 
     Serial.println(C1Data);
-    writeCSV(Year, Month, Day, Hour, Minute, Second, myfile);
+    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, myfile);
     PreviousTime = CurrentTime;
   }
   else{
