@@ -258,7 +258,7 @@ void swapLoggingGroups() {
         String logFilename = getLogFilename(channelId, true);
 
         // Open in append mode (preserve existing data if any)
-        //currentLogFiles[i] = SD.open(logFilename.c_str(), FILE_APPEND); 
+        currentLogFiles[i] = SD.open(logFilename.c_str(), FILE_APPEND); 
 
         if (!currentLogFiles[i]) {
             DEBUG_PRINTF("FATAL: Failed to open new log file %s!\n", logFilename.c_str());

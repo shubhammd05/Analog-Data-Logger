@@ -127,7 +127,7 @@ void IndicatorTask(void* parameter){
   else{
     SwitchOff(LEDR, LEDG);
   }
-  vTaskDelay(50/portTICK_PERIOD_MS);
+ // vTaskDelay(50/portTICK_PERIOD_MS);
 }}
 
 void Channel1Task(void *parameter) {
@@ -217,57 +217,81 @@ C1Data = C4.Read();
 
 void loop(){
   
+if (uploadButtonPressed) {
+      uploadButtonPressed = false;   // clear flag
 
+      if (!isApActive) {
+        Serial.printf("Free Heap BEFORE WiFi: %d bytes\n", ESP.getFreeHeap());
+    Serial.printf("Max Alloc Block: %d bytes\n", ESP.getMaxAllocHeap());
+        swapLoggingGroups();
+        startAccessPoint();
+      }
+      // else {
+      //     stopAccessPoint();
+      //     for (int ch = 1; ch <= 4; ch++) {
+      //         clearLogFile(ch);
+      //     }
+      // }
+    }
+
+    // Keep AP services running
+    if (isApActive) {
+      dnsServer.processNextRequest();
+      checkApTimeout();
+    }
+
+    vTaskDelay(10 / portTICK_PERIOD_MS);  // allow scheduler to run
+  
 xTaskCreatePinnedToCore(
   APTask,
   "APTask",
-  10240,
+  1024*5,
   NULL,
   1,
   &APTaskHandle,
-  1
+  0
 );
 
-// xTaskCreatePinnedToCore(
-//   Channel1Task,
-//   "Channel1Task",
-//   10000,
-//   NULL,
-//   1,
-//   &Channel1TaskHandle,
-//   1);
+xTaskCreatePinnedToCore(
+  Channel1Task,
+  "Channel1Task",
+  5120,
+  NULL,
+  1,
+  &Channel1TaskHandle,
+  1);
 
-//   xTaskCreatePinnedToCore(
-//   Channel2Task,
-//   "Channel2Task",
-//   10000,
-//   NULL,
-//   1,
-//   &Channel2TaskHandle,
-//   1);
+  xTaskCreatePinnedToCore(
+  Channel2Task,
+  "Channel2Task",
+  10000,
+  NULL,
+  1,
+  &Channel2TaskHandle,
+  1);
 
-//   xTaskCreatePinnedToCore(
-//   Channel3Task,
-//   "Channel3Task",
-//   10000,
-//   NULL,
-//   1,
-//   &Channel3TaskHandle,
-//   1);
+  xTaskCreatePinnedToCore(
+  Channel3Task,
+  "Channel3Task",
+  5120,
+  NULL,
+  1,
+  &Channel3TaskHandle,
+  1);
 
-//   xTaskCreatePinnedToCore(
-//   Channel4Task,
-//   "Channel4Task",
-//   10000,
-//   NULL,
-//   1,
-//   &Channel4TaskHandle,
-//   1);
+  xTaskCreatePinnedToCore(
+  Channel4Task,
+  "Channel4Task",
+  5120,
+  NULL,
+  1,
+  &Channel4TaskHandle,
+  1);
 
   xTaskCreatePinnedToCore(
   IndicatorTask,
   "IndicatorTask",
-  2048,
+  1024,
   NULL,
   1,
   &IndicatorTaskhandle,
