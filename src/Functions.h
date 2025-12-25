@@ -16,8 +16,8 @@
         digitalWrite(green, LOW);
   }
 
-  void writeCSV(uint16_t Y,uint8_t M, uint8_t D, uint8_t H, uint8_t Mi, uint8_t S, uint16_t D1, File myFile) {
-  // myFile = SD.open(FileName, FILE_APPEND);
+  void writeCSV(uint16_t Y,uint8_t M, uint8_t D, uint8_t H, uint8_t Mi, uint8_t S, uint16_t D1, File myFile, String FileName) {
+   myFile = SD.open(FileName.c_str(), FILE_APPEND);
   if (myFile) {
     
     myFile.print(D);
@@ -35,7 +35,7 @@
     myFile.print(D1);
     myFile.print("\n");
 
-    // myFile.close();
+    myFile.close();
 
   } else {
     SwitchOff(LEDR, LEDG);

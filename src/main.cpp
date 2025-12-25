@@ -142,7 +142,7 @@ void Channel1Task(void *parameter) {
     Hour = now.hour();
     Minute = now.minute();
     Second = now.second();
-    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[0]);
+    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[0], C1File);
    xSemaphoreGive(mutex);
   }
         DEBUG_PRINTLN("Entry added to CSV. - 1" );
@@ -164,7 +164,7 @@ void Channel2Task(void *parameter) {
     Minute = now.minute();
     Second = now.second();
     
-     writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[1]);
+     writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[1], C2File);
     xSemaphoreGive(mutex);
     }
   DEBUG_PRINTLN("Entry added to CSV. - 2" );
@@ -186,7 +186,7 @@ C1Data = C3.Read();
     Minute = now.minute();
     Second = now.second();
      xSemaphoreGive(mutex);
-    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[2]);
+    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[2], C3File);
     }
     DEBUG_PRINTLN("Entry added to CSV. - 3" );
     vTaskDelay(C3.samplingRate/portTICK_PERIOD_MS);
@@ -207,7 +207,7 @@ C1Data = C4.Read();
     Second = now.second();
     
     
-    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[3]);
+    writeCSV(Year, Month, Day, Hour, Minute, Second, C1Data, currentLogFiles[3], C4File);
     xSemaphoreGive(mutex);
   }
     DEBUG_PRINTLN("Entry added to CSV. - 4" );

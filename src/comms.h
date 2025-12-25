@@ -24,6 +24,12 @@ const int AP_TIMEOUT_MS = 300000; // 5 minutes = 300,000 milliseconds
 unsigned long apStartTime = 0;
 bool isApTimeoutEnabled = true;
 
+String C1File;
+String C2File;
+String C3File;
+String C4File;
+
+
 // --- Debug Macro ---
 #if DEBUG
 #define DEBUG_PRINTLN(x)  Serial.println(x)
@@ -241,6 +247,7 @@ void swapLoggingGroups() {
 
     DEBUG_PRINTLN("--- LOGGING FILE SWAP ---");
 
+
     // Step 1: Close current log files
     for (int i = 0; i < 4; i++) {
         if (currentLogFiles[i]) {
@@ -252,25 +259,38 @@ void swapLoggingGroups() {
     // Step 2: Toggle state (previous download group becomes new logging group)
     isLogGroupAActive = !isLogGroupAActive;
 
-    // Step 3: Open new log files (DO NOT DELETE: they contain data for downloading)
-    for (int i = 0; i < 4; i++) {
-        int channelId = i + 1;
-        String logFilename = getLogFilename(channelId, true);
+    if(isLogGroupAActive){
+        C1File = "/LOG_01.csv";
+        C2File = "/LOG_02.csv";
+        C3File = "/LOG_03.csv";
+        C4File = "/LOG_04.csv";
 
-        // Open in append mode (preserve existing data if any)
-        currentLogFiles[i] = SD.open(logFilename.c_str(), FILE_APPEND); 
-
-        if (!currentLogFiles[i]) {
-            DEBUG_PRINTF("FATAL: Failed to open new log file %s!\n", logFilename.c_str());
-        } else {
-            DEBUG_PRINTF("New Active Log File: %s is OPEN for Channel %d.\n", logFilename.c_str(), channelId);
-            
-            // Only overwrite the header if the file is empty
-            if (DEBUG && currentLogFiles[i].size() == 0) {
-                currentLogFiles[i].println("Year,Month,DayOfMonth,DayOfWeek,Hour,Minute,Second,SamplingRate,Resolution,Attenuation,Data");
-            }
-        }
     }
+    else{
+        C1File = "/LOG_05.csv";
+        C2File = "/LOG_06.csv";
+        C3File = "/LOG_07.csv";
+        C4File = "/LOG_08.csv";
+    }
+    // Step 3: Open new log files (DO NOT DELETE: they contain data for downloading)
+    // for (int i = 0; i < 4; i++) {
+    //     int channelId = i + 1;
+    //     String logFilename = getLogFilename(channelId, true);
+
+    //     // Open in append mode (preserve existing data if any)
+    //     currentLogFiles[i] = SD.open(logFilename.c_str(), FILE_APPEND); 
+
+    //     if (!currentLogFiles[i]) {
+    //         DEBUG_PRINTF("FATAL: Failed to open new log file %s!\n", logFilename.c_str());
+    //     } else {
+    //         DEBUG_PRINTF("New Active Log File: %s is OPEN for Channel %d.\n", logFilename.c_str(), channelId);
+            
+    //         // Only overwrite the header if the file is empty
+    //         if (DEBUG && currentLogFiles[i].size() == 0) {
+    //             currentLogFiles[i].println("Year,Month,DayOfMonth,DayOfWeek,Hour,Minute,Second,SamplingRate,Resolution,Attenuation,Data");
+    //         }
+    //     }
+    // }
 
     DEBUG_PRINTF("New Logging Group State: %s\n", isLogGroupAActive ? "A (LOG_01-04)" : "B (LOG_05-08)");
 }
