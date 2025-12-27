@@ -57,6 +57,7 @@ bool isApActive = false;
 //     float attenuation;
 // };
 ADC channelConfigs[] = {C1, C2, C3, C4};
+File currentLogFiles[4]; 
 // // Initial Configuration
 // ChannelConfig channelConfigs[4] = {
 //     {1, "Channel 1", true, 1000, 12, 6},
@@ -87,6 +88,10 @@ void saveConfigToLittleFS();
 void loadConfigFromLittleFS();
 
 void startAccessPoint() {
+    for(int i = 0; i<4; i++){
+        currentLogFiles[i].close();
+    }
+    SD.end();
     DEBUG_PRINTLN("Starting Access Point...");
     WiFi.softAP(AP_SSID, AP_PASSWORD);
     IPAddress apIP = WiFi.softAPIP();
@@ -223,7 +228,7 @@ void stopAccessPoint() {
 // -----------------------------------------------------------------
 bool sdCardIsReady = false; 
 bool isLogGroupAActive = true; 
-File currentLogFiles[4]; 
+
 
 String getLogFilename(int channelId, bool forLogging) {
     int index = channelId - 1;
@@ -626,7 +631,7 @@ void handleFileList(AsyncWebServerRequest *request) {
 // }
 
 
-#include <LittleFS.h>
+
 
 void saveConfigToLittleFS() {
 

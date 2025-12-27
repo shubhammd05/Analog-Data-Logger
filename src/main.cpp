@@ -127,11 +127,11 @@ void IndicatorTask(void* parameter){
   else{
     SwitchOff(LEDR, LEDG);
   }
- // vTaskDelay(50/portTICK_PERIOD_MS);
+ vTaskDelay(50/portTICK_PERIOD_MS);
 }}
 
 void Channel1Task(void *parameter) {
-  while(!digitalRead(SWITCH)){
+  while(!digitalRead(SWITCH) && SD.begin(SD_CS, SPI)){
   C1Data = C1.Read(); 
   if(xSemaphoreTake(mutex, 0) == pdTRUE){
     DateTime now = rtc.now();
@@ -152,7 +152,7 @@ void Channel1Task(void *parameter) {
 }
 
 void Channel2Task(void *parameter) {
-  while(!digitalRead(SWITCH)){
+  while(!digitalRead(SWITCH) && SD.begin(SD_CS, SPI)){
   C1Data = C2.Read(); 
   if(xSemaphoreTake(mutex, 0) == pdTRUE){
     DateTime now = rtc.now();
@@ -173,7 +173,7 @@ void Channel2Task(void *parameter) {
 }
 
 void Channel3Task(void *parameter) {
-  while(!digitalRead(SWITCH)){
+  while(!digitalRead(SWITCH) && SD.begin(SD_CS, SPI)){
 
 C1Data = C3.Read();
     if(xSemaphoreTake(mutex, 0) == pdTRUE){
@@ -194,7 +194,7 @@ C1Data = C3.Read();
 }
 
 void Channel4Task(void *parameter) {
-while(!digitalRead(SWITCH)){
+while(!digitalRead(SWITCH) && SD.begin(SD_CS, SPI)){
 C1Data = C4.Read(); 
   if(xSemaphoreTake(mutex, 0) == pdTRUE){
     DateTime now = rtc.now();
@@ -242,59 +242,59 @@ if (uploadButtonPressed) {
 
     vTaskDelay(10 / portTICK_PERIOD_MS);  // allow scheduler to run
   
-xTaskCreatePinnedToCore(
-  APTask,
-  "APTask",
-  1024*5,
-  NULL,
-  1,
-  &APTaskHandle,
-  0
-);
+// xTaskCreatePinnedToCore(
+//   APTask,
+//   "APTask",
+//   1024*5,
+//   NULL,
+//   1,
+//   &APTaskHandle,
+//   0
+// );
 
-xTaskCreatePinnedToCore(
-  Channel1Task,
-  "Channel1Task",
-  5120,
-  NULL,
-  1,
-  &Channel1TaskHandle,
-  1);
+// xTaskCreatePinnedToCore(
+//   Channel1Task,
+//   "Channel1Task",
+//   5120,
+//   NULL,
+//   1,
+//   &Channel1TaskHandle,
+//   1);
 
-  xTaskCreatePinnedToCore(
-  Channel2Task,
-  "Channel2Task",
-  10000,
-  NULL,
-  1,
-  &Channel2TaskHandle,
-  1);
+//   xTaskCreatePinnedToCore(
+//   Channel2Task,
+//   "Channel2Task",
+//   10000,
+//   NULL,
+//   1,
+//   &Channel2TaskHandle,
+//   1);
 
-  xTaskCreatePinnedToCore(
-  Channel3Task,
-  "Channel3Task",
-  5120,
-  NULL,
-  1,
-  &Channel3TaskHandle,
-  1);
+//   xTaskCreatePinnedToCore(
+//   Channel3Task,
+//   "Channel3Task",
+//   5120,
+//   NULL,
+//   1,
+//   &Channel3TaskHandle,
+//   1);
 
-  xTaskCreatePinnedToCore(
-  Channel4Task,
-  "Channel4Task",
-  5120,
-  NULL,
-  1,
-  &Channel4TaskHandle,
-  1);
+//   xTaskCreatePinnedToCore(
+//   Channel4Task,
+//   "Channel4Task",
+//   5120,
+//   NULL,
+//   1,
+//   &Channel4TaskHandle,
+//   1);
 
-  xTaskCreatePinnedToCore(
-  IndicatorTask,
-  "IndicatorTask",
-  1024,
-  NULL,
-  1,
-  &IndicatorTaskhandle,
-  1);
-
+//   xTaskCreatePinnedToCore(
+//   IndicatorTask,
+//   "IndicatorTask",
+//   1024,
+//   NULL,
+//   1,
+//   &IndicatorTaskhandle,
+//   1);
+    
 }
