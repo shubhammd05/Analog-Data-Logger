@@ -9,7 +9,7 @@
 #include <time.h>
 
 // --- Configuration & Global Constants ---
-#define DEBUG 0
+#define DEBUG 1
  
 
 const byte DNS_PORT = 53;
@@ -31,7 +31,7 @@ String C4File;
 
 
 // --- Debug Macro ---
-#if DEBUG
+#if DEBUG 
 #define DEBUG_PRINTLN(x)  Serial.println(x)
 #define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
 #else
@@ -88,10 +88,10 @@ void saveConfigToLittleFS();
 void loadConfigFromLittleFS();
 
 void startAccessPoint() {
-    for(int i = 0; i<4; i++){
-        currentLogFiles[i].close();
-    }
-    SD.end();
+    // for(int i = 0; i<4; i++){
+    //     currentLogFiles[i].close();
+    // }
+    // SD.end();
     DEBUG_PRINTLN("Starting Access Point...");
     WiFi.softAP(AP_SSID, AP_PASSWORD);
     IPAddress apIP = WiFi.softAPIP();

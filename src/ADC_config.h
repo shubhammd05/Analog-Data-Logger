@@ -26,7 +26,7 @@ class ADC{
     }
 
     void SetResolution(int r){
-        if(9<=r<=12){
+        if(r>=9 && r<=12){
             resolution = r;
         }
         else{

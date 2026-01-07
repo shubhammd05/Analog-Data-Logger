@@ -289,7 +289,7 @@
                 // Parse numbers to ensure they are sent as JSON numbers, not strings
                 const samplingRate = parseInt(document.getElementById(`ch${i}_samplingRate`).value);
                 const resolution = parseInt(document.getElementById(`ch${i}_resolution`).value);
-                const attenuation = parseInt(document.getElementById(`ch${i}_attn`).value);
+                // const attenuation = parseInt(document.getElementById(`ch${i}_attn`).value);
                 // The .checked property ensures we send a boolean true/false
                 const enabled = document.getElementById(`ch${i}_enabled`).checked; 
 
@@ -300,7 +300,6 @@
                     enabled: enabled,
                     samplingRate: samplingRate,
                     resolution: resolution,
-                    attenuation: attenuation
                 });
             }
 
