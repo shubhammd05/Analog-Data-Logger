@@ -2,445 +2,360 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 Data Logger</title>
     <script src="chart.min.js"></script>
     <style>
-        /* Equivalent of Tailwind utility classes used in data_page.html */
-
-        /* General Layout */
-        .bg-gray-100 { background-color: #f3f4f6; }
-        .container { width: 100%; margin-left: auto; margin-right: auto; }
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .p-8 { padding: 2rem; }
+        /* --- Base Setup --- */
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f3f4f6; color: #1f2937; }
+        
+        /* Layout Utilities */
+        .container { width: 100%; margin: 0 auto; padding: 0 1.5rem; }
         .max-w-5xl { max-width: 64rem; }
-        .space-y-8 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(2rem * var(--tw-space-y-reverse)); }
-        .text-center { text-align: center; }
-        .relative { position: relative; }
-        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-        .font-bold { font-weight: 700; }
-        .text-gray-500 { color: #6b7280; }
-        .mt-2 { margin-top: 0.5rem; }
-        .absolute { position: absolute; }
-        .top-0 { top: 0; }
-        .right-0 { right: 0; }
-        
-        /* Buttons/Boxes */
-        .bg-purple-200 { background-color: #e9d5ff; }
-        .hover\:bg-gray-300:hover { background-color: #d1d5db; }
-        .text-gray-800 { color: #1f2937; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .bg-white { background-color: #ffffff; }
-        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .p-8 { padding: 2rem; }
         .p-6 { padding: 1.5rem; }
-        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-        .font-semibold { font-weight: 600; }
         .mb-4 { margin-bottom: 1rem; }
-        .w-full { width: 100%; }
-        .bg-purple-500 { background-color: #8b5cf6; }
-        .hover\:bg-purple-600:hover { background-color: #7c3aed; }
-        .text-white { color: #ffffff; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .md\:flex-row { flex-direction: row; }
-        .justify-between { justify-content: space-between; }
-        .items-center { align-items: center; }
-        .mt-4 { margin-top: 1rem; }
-        .md\:mt-0 { margin-top: 0; }
-        .mr-2 { margin-right: 0.5rem; }
-        .text-gray-700 { color: #374151; }
-        .p-2 { padding: 0.5rem; }
-        .border { border-width: 1px; }
-        .rounded-md { border-radius: 0.375rem; }
-        .h-96 { height: 24rem; } 
-
-        /* Loading Screen Styles */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            font-size: 1.5rem;
-            color: #4b5563;
-        }
+        .space-y-8 > * + * { margin-top: 2rem; }
         .hidden { display: none !important; }
-        
-        /* Debug Log Styles */
-        #debug-log {
-            margin-top: 1rem;
-            padding: 0.5rem;
-            background-color: #1f2937;
-            color: #10b981;
-            font-family: monospace;
-            white-space: pre-wrap;
-            height: 8rem;
-            overflow-y: scroll;
-            border-radius: 0.375rem;
-            font-size: 0.8rem;
+
+        /* Typography */
+        .text-4xl { font-size: 2.25rem; font-weight: 800; color: #111827; margin: 0; }
+        .text-xl { font-size: 1.25rem; font-weight: 600; color: #374151; }
+        .text-gray-500 { color: #6b7280; margin: 0; }
+        .font-bold { font-weight: 700; }
+
+        /* --- RESPONSIVE HEADER --- */
+        .header-container {
+            display: flex;
+            flex-wrap: wrap; /* Allows wrapping on small phones */
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
+        
+        /* On very small screens, center everything */
+        @media (max-width: 600px) {
+            .header-container {
+                flex-direction: column;
+                justify-content: center;
+            }
+            .text-4xl { font-size: 1.75rem; } /* Slightly smaller text for phones */
+        }
+
+        /* Components */
+        .bg-white { background-color: white; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        /* Inputs & Buttons (STATIC) */
+        button { cursor: pointer; border: none; font-family: inherit; }
+        button:disabled { background-color: #9ca3af !important; cursor: not-allowed; }
+        select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background: #fff; font-size: 1rem; }
+
+        .btn-primary {
+            background-color: #8b5cf6; color: white;
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+            font-weight: 600; width: 100%; font-size: 1rem;
+        }
+        .btn-primary:hover { background-color: #7c3aed; }
+        .btn-primary:active { background-color: #6d28d9; }
+
+        .btn-secondary {
+            background-color: #e9d5ff; color: #4c1d95;
+            padding: 0.5rem 1rem; border-radius: 0.5rem;
+            font-weight: 600; text-decoration: none; display: inline-block;
+            white-space: nowrap; /* Prevent button text wrapping */
+        }
+        .btn-secondary:hover { background-color: #ddd6fe; }
+
+        .btn-small {
+            background-color: #f3f4f6; color: #374151;
+            padding: 0.35rem 0.85rem; border-radius: 0.375rem;
+            font-size: 0.875rem; font-weight: 600;
+            border: 1px solid #d1d5db;
+        }
+        .btn-small:hover { background-color: #e5e7eb; color: #111827; border-color: #9ca3af; }
+
+        /* Status & Progress */
+        .status-box {
+            padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem;
+            text-align: center; font-size: 1.125rem; font-weight: 500;
+            border: 1px solid transparent;
+        }
+        .status-info { background-color: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+        .status-error { background-color: #fef2f2; color: #991b1b; border-color: #fecaca; }
+
+        .progress-track { 
+            width: 100%; height: 0.75rem; background-color: #e5e7eb; 
+            border-radius: 999px; overflow: hidden; display: none; margin-bottom: 1.5rem; 
+        }
+        .progress-fill { 
+            height: 100%; background-color: #8b5cf6; width: 0%; 
+            transition: width 0.3s ease-out; 
+        }
+
+        /* Chart & Debug */
+        .h-96 { height: 24rem; position: relative; }
+        .debug-container { margin-top: 3rem; border-top: 1px solid #e5e7eb; padding-top: 2rem; }
+        #debug-log {
+            background-color: #111827; color: #4ade80;
+            padding: 1rem; border-radius: 0.5rem;
+            font-family: monospace; font-size: 0.85rem;
+            height: 12rem; overflow-y: auto; white-space: pre-wrap;
+        }
+        
+        /* Helper Flex classes for internal content */
+        .flex-row-spaced { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body class="bg-gray-100">
 
-    <div id="loading-overlay">
-        Loading file list from SD card...
-    </div>
-
-    <div id="main-content" class="container mx-auto p-8 max-w-5xl space-y-8 hidden">
-        <header class="text-center relative">
-            <h1 class="text-4xl font-bold">ESP32 CSV Data Logger</h1>
-            <p class="text-gray-500 mt-2">Select a CSV file from SD card to visualize data.</p>
-            <div class="absolute top-0 right-0">
-                 <a href="/parameters.html" class="bg-purple-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">
-                    Parameters
-                </a>
+    <div class="container mx-auto max-w-5xl p-8">
+        
+        <header class="header-container">
+            <div style="text-align: left;">
+                <h1 class="text-4xl">ESP32 Data Logger</h1>
+                <p class="text-gray-500" style="margin-top: 0.5rem;">Visualize data, calibrated in real-time</p>
+            </div>
+            <div>
+                 <a href="/parameters.html" class="btn-secondary">Parameters</a>
             </div>
         </header>
 
         <main class="space-y-8">
+            
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4">Data Management</h2>
-                <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-                    <div class="mt-4 md:mt-0 w-full">
-                        <label for="fileSelector" class="mr-2 text-gray-700">Select File:</label>
-                        <select id="fileSelector" class="p-2 border rounded-md bg-white w-full md:w-auto">
-                            <option value="">-- Select File --</option>
-                        </select>
-                    </div>
+                <h2 class="text-xl mb-4">Data Management</h2>
+                <div class="mb-4">
+                    <label for="fileSelector" class="text-gray-500 font-bold block mb-2">Select File:</label>
+                    <select id="fileSelector">
+                        <option value="">-- Loading files... --</option>
+                    </select>
                 </div>
-                <button id="loadBtn" onclick="loadChart()" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg">Load Chart</button>
+                <button id="loadBtn" onclick="loadChart()" class="btn-primary">Load & Visualize</button>
             </div>
 
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4">Data Visualization</h2>
-                <p id="status" class="text-center text-gray-500 mb-4">Select a file and click Load Chart to begin.</p>
-                
-                <div id="progress" class="w-full h-8 bg-gray-200 rounded-full overflow-hidden mb-4 hidden">
-                    <div id="progressBar" class="h-full bg-purple-500 text-white text-center leading-8" style="width: 0%;">0%</div>
+                <div class="flex-row-spaced mb-4">
+                    <h2 class="text-xl">Visualization</h2>
+                    <span id="configSummary" class="text-gray-500 bg-gray-100 px-2 py-1 rounded-lg hidden" style="font-size: 0.875rem"></span>
                 </div>
 
-                <div class="relative h-96">
+                <div id="status" class="status-box status-info">Select a file and click Load to begin</div>
+                
+                <div id="progress" class="progress-track">
+                    <div id="progressBar" class="progress-fill"></div>
+                </div>
+
+                <div class="h-96">
                     <canvas id="myChart"></canvas>
                 </div>
             </div>
 
-            <div id="debug-log-container" class="bg-white rounded-lg shadow-md p-6"> 
-                <div class="mt-4">
-                    <h3 class="text-xl font-semibold text-gray-800">Debug Log</h3>
-                    <pre id="debug-log">System Initialized. Waiting for file selection...</pre>
+            <div class="bg-white rounded-lg shadow-md p-6 debug-container"> 
+                <div class="flex-row-spaced mb-2">
+                    <h3 class="text-xl">System Log</h3>
+                    <button onclick="document.getElementById('debug-log').textContent=''" class="btn-small">Clear Log</button>
                 </div>
+                <div id="debug-log">System Initialized.</div>
             </div>
+
         </main>
     </div>
 
 <script>
-    const DEBUG = true;
-    const LOG_TIME_PREFIX = () => `[${new Date().toLocaleTimeString('en-US', {hour12: false})}] `;
-    
-    function logMessage(message, isError = false) {
-        if (!DEBUG) {
-            return;
-        }
-
-        const logBox = document.getElementById('debug-log');
-        const logEntry = LOG_TIME_PREFIX() + (isError ? 'ERROR: ' : 'INFO: ') + message + '\n';
-        
-        if (isError) {
-             console.error(message);
-        } else {
-             console.log(message);
-        }
-        
-        logBox.textContent += logEntry;
-        logBox.scrollTop = logBox.scrollHeight;
-    }
+    // --- CONFIG ---
+    const DEBUG = true; 
 
     let chart = null;
     const timestamps = [];
-    const valueData = [];
+    const calibratedValues = [];
+    let channelConfig = {};
     let isLoading = false;
-    
-    // Load available channels on page load
-    window.addEventListener('load', () => {
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const mainContent = document.getElementById('main-content');
-        const logContainer = document.getElementById('debug-log-container');
 
-        if (!DEBUG) {
-            logContainer.classList.add('hidden');
+    // --- UTILS ---
+    function log(msg, isErr = false) {
+        if (!DEBUG) return;
+        const box = document.getElementById('debug-log');
+        const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+        const pre = isErr ? '[ERR] ' : '[INF] ';
+        box.textContent += `\n[${time}] ${pre}${msg}`;
+        box.scrollTop = box.scrollHeight;
+        if(isErr) console.error(msg); else console.log(msg);
+    }
+
+    function showStatus(msg, type = 'info') {
+        const el = document.getElementById('status');
+        el.textContent = msg;
+        el.className = `status-box ${type === 'error' ? 'status-error' : 'status-info'}`;
+    }
+
+    function updateProgress(pct) {
+        document.getElementById('progress').style.display = 'block';
+        document.getElementById('progressBar').style.width = pct + '%';
+    }
+
+    function hideProgress() {
+        document.getElementById('progress').style.display = 'none';
+    }
+
+    // --- LOGIC ---
+    async function loadConfig() {
+        try {
+            // FIX: Added timestamp to prevent caching so Unit updates immediately
+            const res = await fetch('/config.json?t=' + Date.now());
+            return res.ok ? (await res.json()).channels || [] : [];
+        } catch (e) { return []; }
+    }
+
+    window.addEventListener('load', async () => {
+        log('Fetching file list...');
+        try {
+            // FIX: Added timestamp to file list as well
+            const res = await fetch('/api/files?t=' + Date.now());
+            const data = await res.json();
+            const sel = document.getElementById('fileSelector');
+            sel.innerHTML = '<option value="">-- Select File --</option>';
+
+            if (data.channels?.length) {
+                data.channels.forEach(ch => {
+                    const opt = document.createElement('option');
+                    opt.value = ch.filename; 
+                    opt.textContent = `${ch.name} (${ch.filename})`;
+                    sel.appendChild(opt);
+                });
+                log(`Loaded ${data.channels.length} files.`);
+            } else {
+                sel.innerHTML = '<option value="">No Data Files Found</option>';
+            }
+        } catch (e) {
+            log('Error fetching list: ' + e.message, true);
+            showStatus('Error connecting to ESP32', 'error');
         }
-
-        logMessage('Attempting to fetch channel list from /api/files...');
-        
-        fetch('/api/files')
-            .then(response => response.json())
-            .then(data => {
-                const selector = document.getElementById('fileSelector');
-            
-                if (data.channels && data.channels.length > 0) {
-                    data.channels.forEach(channel => {
-                        const option = document.createElement('option');
-                        option.value = channel.filename.replace('.csv', ''); // e.g., "LOG_01"
-                        option.textContent = channel.name; // e.g., "Voltage_A" or "Channel 1"
-                        selector.appendChild(option);
-                    });
-                    logMessage(`Channel list loaded successfully. Found ${data.channels.length} channels.`);
-                } else {
-                    logMessage('No channels available for download.', true);
-                    selector.innerHTML += '<option value="" disabled>No data available</option>';
-                }
-            
-                // Hide loading screen and show content
-                loadingOverlay.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-            })
-            .catch(err => {
-                console.error('Error loading channel list:', err);
-                logMessage(`Error loading channel list: ${err.message}`, true);
-                showStatus('Error loading channel list', 'error');
-                
-                // Still show main content even on error
-                loadingOverlay.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-            });
     });
 
-    
-    function showStatus(message, type = 'info') {
-        const statusDiv = document.getElementById('status');
-        statusDiv.textContent = message;
-        statusDiv.style.color = type === 'error' ? '#f44336' : '#6b7280';
-    }
-    
-    function updateProgress(percent) {
-        const progressDiv = document.getElementById('progress');
-        const progressBar = document.getElementById('progressBar');
-        progressDiv.classList.remove('hidden');
-        progressBar.style.width = percent + '%';
-        progressBar.textContent = Math.round(percent) + '%';
-    }
-    
-    function hideProgress() {
-        document.getElementById('progress').classList.add('hidden');
-    }
-    
     async function loadChart() {
-        if(isLoading) return;
-        
-        const filename = document.getElementById('fileSelector').value;
-        if(!filename) {
-            alert('Please select a file');
-            return;
-        }
-        
+        if (isLoading) return;
+        const fname = document.getElementById('fileSelector').value;
+        if (!fname) return alert('Please select a file first.');
+
         isLoading = true;
         document.getElementById('loadBtn').disabled = true;
-        
-        // Clear previous data
         timestamps.length = 0;
-        valueData.length = 0;
+        calibratedValues.length = 0;
         
-        showStatus('Loading ' + filename + '.csv...');
         updateProgress(0);
-        logMessage(`Starting to load ${filename}.csv...`);
-        
+        showStatus(`Loading ${fname}...`);
+        log(`Download: ${fname}`);
+
         try {
-            await streamCSV(filename);
-            showStatus('Chart loaded successfully! (' + valueData.length + ' points)');
-            logMessage(`Chart loaded successfully with ${valueData.length} data points.`);
-            hideProgress();
-        } catch(error) {
-            console.error('Error:', error);
-            showStatus('Error loading file: ' + error.message, 'error');
-            logMessage(`Error loading file: ${error.message}`, true);
-            hideProgress();
-        }
-        
-        isLoading = false;
-        document.getElementById('loadBtn').disabled = false;
-    }
-    
-    async function streamCSV(filename) {
-        const response = await fetch('/api/stream?file=' + filename);
-        
-        if(!response.ok) {
-            throw new Error('HTTP error ' + response.status);
-        }
-        
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        
-        let buffer = '';
-        let rowCount = 0;
-        const BATCH_SIZE = 50;
-        let estimatedTotal = 1000;
-        
-        while(true) {
-            const {done, value} = await reader.read();
+            const configs = await loadConfig();
             
-            if(done) break;
-            
-            buffer += decoder.decode(value, {stream: true});
-            
-            let lines = buffer.split('\n');
-            buffer = lines.pop();
-            
-            lines.forEach((line, idx) => {
-                if(line.trim() === '') return;
-                
-                if(DEBUG && rowCount === 0) {
-                    rowCount++;
-                    return;
-                }
-                
-                const cols = line.split(',');
-                
-                if(cols.length >= 11) {
-                    const year = cols[0].trim();
-                    const month = cols[1].trim();
-                    const date = cols[2].trim();
-                    const day = cols[3].trim();
-                    const hour = cols[4].trim();
-                    const minutes = cols[5].trim();
-                    const second = cols[6].trim();
-                    
-                    const timeLabel = `${month}/${date} ${hour}:${minutes}:${second}`;
-                    
-                    timestamps.push(timeLabel);
-                    
-                    const valueStr = cols[10].trim();
-                    const value = parseFloat(cols[10].trim());
+            // Map file index to config index
+            const match = fname.match(/LOG_(\d+)/);
+            const fNum = match ? parseInt(match[1]) : 1;
+            const cIdx = (fNum - 1) % 4; 
+            channelConfig = configs[cIdx] || {};
 
-                    if (!isNaN(value)) {
-                        valueData.push(value);
-                    } else {
-                        console.warn(`Row ${rowCount}: Invalid value "${valueStr}"`);
-                        valueData.push(0);
-                    }
-                    
-                    rowCount++;
-                    
-                    if(rowCount % BATCH_SIZE === 0) {
-                        updateChart();
-                        updateProgress((rowCount / estimatedTotal) * 100);
+            const sum = document.getElementById('configSummary');
+            sum.textContent = `Active: ${channelConfig.name || 'Unknown'} | Unit: ${channelConfig.unit || 'raw'} | Scale: ${channelConfig.calibration_scale || 1}`;
+            sum.classList.remove('hidden');
+
+            const cleanName = fname.startsWith('/') ? fname.substring(1) : fname;
+            const res = await fetch(`/api/stream?file=${cleanName}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+            const reader = res.body.getReader();
+            const dec = new TextDecoder();
+            let buf = '';
+            let count = 0;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buf += dec.decode(value, { stream: true });
+                const lines = buf.split('\n');
+                buf = lines.pop() || ''; 
+
+                for (const line of lines) {
+                    if (!line.trim() || line.includes('Year,Month')) continue; 
+                    const cols = line.split(',');
+                    if (cols.length >= 8) {
+                        const t = `${cols[1]}/${cols[2]} ${cols[3]}:${cols[4]}:${cols[5]}.${cols[6]}`;
+                        const raw = parseFloat(cols[7]); 
+                        const scale = channelConfig.calibration_scale || 1.0;
+                        const off = channelConfig.calibration_offset || 0.0;
+                        
+                        timestamps.push(t);
+                        calibratedValues.push((raw * scale) + off);
+                        count++;
+
+                        if (count % 100 === 0) {
+                            updateChart();
+                            updateProgress(Math.min(95, count / 20)); 
+                        }
                     }
                 }
-            });
-        }
-        
-        if(buffer.trim()) {
-            const cols = buffer.split(',');
-            if(cols.length >= 11) {
-                const month = cols[1].trim();
-                const date = cols[2].trim();
-                const hour = cols[4].trim();
-                const minutes = cols[5].trim();
-                const second = cols[6].trim();
-                timestamps.push(`${month}/${date} ${hour}:${minutes}:${second}`);
-                valueData.push(parseFloat(cols[10].trim()));
             }
-        }
-        
-        updateProgress(100);
-        updateChart();
-    }
-    
-    function updateChart() {
-        if(chart) {
-            chart.data.labels = timestamps.slice();
-            chart.data.datasets[0].data = valueData.slice();
-            chart.update('none');
-        } else {
-            const minValue = Math.min(...valueData);
-            const maxValue = Math.max(...valueData);
-            const range = maxValue - minValue;
-            const padding = range * 0.1 || 1;
+            
+            updateProgress(100);
+            updateChart();
+            log(`Done. ${count} pts.`);
+            showStatus(`Loaded ${count} points for ${channelConfig.name}`, 'info');
 
-            const ctx = document.getElementById('myChart').getContext('2d');
+        } catch (err) {
+            log(`Err: ${err.message}`, true);
+            showStatus(`Error: ${err.message}`, 'error');
+        } finally {
+            isLoading = false;
+            hideProgress();
+            document.getElementById('loadBtn').disabled = false;
+        }
+    }
+
+    function updateChart() {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const limit = 1000; 
+        const lbls = timestamps.slice(-limit);
+        const vals = calibratedValues.slice(-limit);
+
+        if (chart) {
+            chart.data.labels = lbls;
+            chart.data.datasets[0].data = vals;
+            chart.data.datasets[0].label = `${channelConfig.name || 'Data'} (${channelConfig.unit || 'raw'})`;
+            chart.update('none'); 
+        } else {
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: timestamps,
+                    labels: lbls,
                     datasets: [{
-                        label: 'Sensor Value',
-                        data: valueData,
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        label: 'Sensor Data',
+                        data: vals,
+                        borderColor: '#8b5cf6', 
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
                         borderWidth: 2,
-                        pointRadius: 4,
-                        pointBackgroundColor: 'rgb(75, 192, 192)',
-                        pointBorderColor: '#fff',
-                        pointHoverRadius: 6,
-                        pointHoverBackgroundColor: 'rgb(75, 192, 192)',
-                        pointHoverBorderColor: '#fff',
+                        pointRadius: 0, 
+                        pointHoverRadius: 4,
                         fill: true,
-                        tension: 0.1,
-                        spanGaps: true
+                        tension: 0.1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: true
-                        },
-                        tooltip: {
-                            enabled: true,
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Timestamp'
-                            },
-                            ticks: {
-                                maxTicksLimit: 10,
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Value'
-                            },
-                            suggestedMin: minValue - padding,
-                            suggestedMax: maxValue + padding,
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toFixed(2);
-                                }
-                            }
-                        }
-                    }
+                    animation: false, 
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: true }, tooltip: { enabled: true } },
+                    scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { beginAtZero: false } }
                 }
             });
-
-            console.log('Chart created with:');
-            console.log('- Data points:', valueData.length);
-            console.log('- Min value:', minValue);
-            console.log('- Max value:', maxValue);
-            console.log('- Y-axis range:', minValue - padding, 'to', maxValue + padding);
-            
-            logMessage(`Chart rendered with ${valueData.length} points. Y-axis: ${(minValue - padding).toFixed(2)} to ${(maxValue + padding).toFixed(2)}`);
         }
     }
 </script>
-
 </body>
 </html>

@@ -1,32 +1,52 @@
 {
   "channels": [
     {
-      "id": 0,
+      "id": 1,
       "name": "Channel_1",
       "enabled": true,
       "samplingRate": 1000,
-      "resolution": 12
-    },
-    {
-      "id": 1,
-      "name": "Channel_2",
-      "enabled": true,
-      "samplingRate": 1000,
-      "resolution": 10
+      "resolution": 12,
+      "attenuation": 3,
+      "unit": "raw",
+      "calibration_offset": 0.0,
+      "calibration_scale": 1.0
     },
     {
       "id": 2,
-      "name": "Channel_3",
-      "enabled": false,
+      "name": "Channel_2",
+      "enabled": true,
       "samplingRate": 1000,
-      "resolution": 8
+      "resolution": 12,
+      "attenuation": 3,
+      "unit": "raw",
+      "calibration_offset": 0.0,
+      "calibration_scale": 1.0
     },
     {
       "id": 3,
+      "name": "Channel_3",
+      "enabled": false,
+      "samplingRate": 1000,
+      "resolution": 12,
+      "attenuation": 3,
+      "unit": "raw",
+      "calibration_offset": 0.0,
+      "calibration_scale": 1.0
+    },
+    {
+      "id": 4,
       "name": "Channel_4",
       "enabled": true,
       "samplingRate": 1000,
-      "resolution": 12
+      "resolution": 12,
+      "attenuation": 3,
+      "unit": "raw",
+      "calibration_offset": 0.0,
+      "calibration_scale": 1.0
     }
-  ]
+  ],
+  "session_info": {
+    "device_id": "ESP32-Logger-001",
+    "firmware_version": "1.0.0"
+  }
 }

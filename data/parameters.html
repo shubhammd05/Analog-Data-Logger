@@ -2,331 +2,421 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 - Parameters</title>
     <style>
-        /* Equivalent of Tailwind base styles and utility classes */
-
-        /* Optional: Add a simple focus style not covered by default Tailwind setup */
-        .input-focus:focus {
-            border-color: #3b82f6; /* focus:border-blue-500 */
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:ring-blue-500 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            padding: 20px;
         }
-        .bg-gray-100 { background-color: #f3f4f6; }
-        .container { width: 100%; margin-left: auto; margin-right: auto; }
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .p-8 { padding: 2rem; }
-        .max-w-3xl { max-width: 48rem; } /* Equivalent to 48rem */
-        .text-center { text-align: center; }
-        .mb-8 { margin-bottom: 2rem; }
-        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-        .font-bold { font-weight: 700; }
-        .text-gray-800 { color: #1f2937; }
-        .text-gray-500 { color: #6b7280; }
-        .mt-2 { margin-top: 0.5rem; }
-        .bg-white { background-color: #ffffff; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-        .space-y-8 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(2rem * var(--tw-space-y-reverse)); }
-        .space-y-6 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(1.5rem * var(--tw-space-y-reverse)); }
-        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-        .font-semibold { font-weight: 600; }
-        .text-blue-600 { color: #2563eb; }
-        .mb-4 { margin-bottom: 1rem; }
-        .text-gray-600 { color: #4b5563; }
-        /* UPDATED/NEW SPACING RULES FOR BOXES (1.5rem) */
-        .p-6 { padding: 1.5rem; } 
-        .mb-6 { margin-bottom: 1.5rem; } 
-        .bg-gray-50 { background-color: #f9fafb; }
-        .space-y-6-channel > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(1.5rem * var(--tw-space-y-reverse)); } 
-        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-        .border-b { border-bottom-width: 1px; }
-        .pb-2 { padding-bottom: 0.5rem; }
-        .grid { display: grid; }
-        .gap-6 { gap: 1.5rem; } 
-        .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        .block { display: block; }
-        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .font-medium { font-weight: 500; }
-        .text-gray-700 { color: #374151; }
-        .mb-1 { margin-bottom: 0.25rem; }
-        .w-full { width: 100%; }
-        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .border-gray-300 { border-color: #d1d5db; }
-        .focus\:ring-blue-500:focus { --tw-ring-opacity: 1; --tw-ring-color: rgba(59, 130, 246, var(--tw-ring-opacity)); --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color); box-shadow: var(--tw-ring-shadow); }
-        .focus\:border-blue-500:focus { border-color: #3b82f6; }
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .pt-2 { padding-top: 0.5rem; }
-        .h-4 { height: 1rem; }
-        .w-4 { width: 1rem; }
-        .text-blue-600 { color: #2563eb; }
-        .ml-2 { margin-left: 0.5rem; }
-
-        /* Footer/Button Styles */
-        .pt-4 { padding-top: 1rem; }
-        .justify-between { justify-content: space-between; }
-        .border-t { border-top-width: 1px; }
-        .w-auto { width: auto; }
-        .bg-gray-500 { background-color: #6b7280; }
-        .hover\:bg-gray-600:hover { background-color: #4b5563; }
-        .text-white { color: #ffffff; }
-        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-        .transition-colors { transition-property: background-color, border-color, color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-        .bg-green-500 { background-color: #10b981; }
-        .hover\:bg-green-600:hover { background-color: #059669; }
-        .border-gray-200 { border-color: #e5e7eb; }
+        .container { 
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        .channel-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .channel-box h3 {
+            color: #1f2937;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        small {
+            display: block;
+            color: #6b7280;
+            font-size: 0.8em;
+            margin-top: 3px;
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            margin-top: 12px;
+        }
+        .checkbox-row input {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+        }
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        button, .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .helper {
+            background: #fef3c7;
+            border-left: 3px solid #f59e0b;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 0.85em;
+            color: #92400e;
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
+    <div class="container">
+        <h1>Device Parameters</h1>
+        <p class="subtitle">Configure ADC channels, sampling rates, and calibration</p>
 
-    <div class="container mx-auto p-8 max-w-3xl">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-800">Device Parameters</h1>
-            <p class="text-gray-500 mt-2">Configure ADC, sampling, and channel settings.</p>
-        </header>
-
-        <main class="bg-white rounded-lg shadow-xl p-8 space-y-8">
-            
-            <form id="parameterForm" action="/save-parameters" class="space-y-6">
-
-                <div>
-                    <h2 class="text-2xl font-semibold text-blue-600 mb-4">Individual Channel Configuration (4 Channels)</h2>
-                    <p class="text-gray-600">Set specific sampling and ADC parameters for each independent channel.</p>
-                </div>
-
-                <div class="p-6 border border-gray-200 rounded-lg mb-6 bg-gray-50 space-y-6-channel">
-                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Channel 1 Settings</h3>
-                    <div class="grid md:grid-cols-4 gap-6">
-                        <div>
-                            <label for="ch1_name" class="block text-sm font-medium text-gray-700 mb-1">Channel Name</label>
-                            <input type="text" id="ch1_name" name="ch1_name" value="Voltage_A" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                        <div>
-                            <label for="ch1_samplingRate" class="block text-sm font-medium text-gray-700 mb-1">Sampling Interval(ms)</label>
-                            <input type="number" id="ch1_samplingRate" name="ch1_samplingRate" min="1" value="1000" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                        <div>
-                            <label for="ch1_resolution" class="block text-sm font-medium text-gray-700 mb-1">Resolution (Bits)</label>
-                            <select id="ch1_resolution" name="ch1_resolution" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="9">9-bit</option>
-                                <option value="10">10-bit</option>
-                                <option value="11">11-bit</option>
-                                <option value="12" selected>12-bit</option>
-                            </select>
-                        </div>
-                        <!-- <div>
-                            <label for="ch1_attn" class="block text-sm font-medium text-gray-700 mb-1">Attenuation</label>
-                            <select id="ch1_attn" name="ch1_attn" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0">0 dB</option>
-                                <option value="1">2.5 dB</option>
-                                <option value="2" selected>6 dB</option>
-                                <option value="3">11 dB</option>
-                            </select>
-                        </div> -->
-                    </div>
-                    <div class="flex items-center pt-2">
-                        <input id="ch1_enabled" name="ch1_enabled" type="checkbox" checked
-                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label for="ch1_enabled" class="ml-2 font-medium text-gray-700 text-sm">Enable Channel 1</label>
-                    </div>
-                </div>
-
-                <div class="p-6 border border-gray-200 rounded-lg mb-6 bg-gray-50 space-y-6-channel">
-                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Channel 2 Settings</h3>
-                    <div class="grid md:grid-cols-4 gap-6">
-                        <div>
-                            <label for="ch2_name" class="block text-sm font-medium text-gray-700 mb-1">Channel Name</label>
-                            <input type="text" id="ch2_name" name="ch2_name" value="Current_B" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                        <div>
-                            <label for="ch2_samplingRate" class="block text-sm font-medium text-gray-700 mb-1">Sampling Rate (Hz)</label>
-                            <input type="number" id="ch2_samplingRate" name="ch2_samplingRate" min="1" value="500" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                        <div>
-                            <label for="ch2_resolution" class="block text-sm font-medium text-gray-700 mb-1">Resolution (Bits)</label>
-                            <select id="ch2_resolution" name="ch2_resolution" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="9">9-bit</option>
-                                <option value="10" selected>10-bit</option>
-                                <option value="11">11-bit</option>
-                                <option value="12">12-bit</option>
-                            </select>
-                        </div>
-                        <!-- <div>
-                            <label for="ch2_attn" class="block text-sm font-medium text-gray-700 mb-1">Attenuation</label>
-                            <select id="ch2_attn" name="ch2_attn" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0">0 dB</option>
-                                <option value="1">2.5 dB</option>
-                                <option value="2">6 dB</option>
-                                <option value="3" selected>11 dB</option>
-                            </select>
-                        </div> -->
-                    </div>
-                    <div class="flex items-center pt-2">
-                        <input id="ch2_enabled" name="ch2_enabled" type="checkbox" checked
-                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label for="ch2_enabled" class="ml-2 font-medium text-gray-700 text-sm">Enable Channel 2</label>
-                    </div>
-                </div>
+        <form id="parameterForm">
+            <!-- Channel 1 -->
+            <div class="channel-box">
+                <h3>Channel 1 Settings</h3>
                 
-                <div class="p-6 border border-gray-200 rounded-lg mb-6 bg-gray-50 space-y-6-channel">
-                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Channel 3 Settings</h3>
-                    <div class="grid md:grid-cols-4 gap-6">
-                        <div>
-                            <label for="ch3_name" class="block text-sm font-medium text-gray-700 mb-1">Channel Name</label>
-                            <input type="text" id="ch3_name" name="ch3_name" value="Temperature_C" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                         <div>
-                            <label for="ch3_samplingRate" class="block text-sm font-medium text-gray-700 mb-1">Sampling Rate (Hz)</label>
-                            <input type="number" id="ch3_samplingRate" name="ch3_samplingRate" min="1" value="10" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                        <div>
-                            <label for="ch3_resolution" class="block text-sm font-medium text-gray-700 mb-1">Resolution (Bits)</label>
-                            <select id="ch3_resolution" name="ch3_resolution" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="9" selected>9-bit</option>
-                                <option value="10">10-bit</option>
-                                <option value="11">11-bit</option>
-                                <option value="12">12-bit</option>
-                            </select>
-                        </div>
-                        <!-- <div>
-                            <label for="ch3_attn" class="block text-sm font-medium text-gray-700 mb-1">Attenuation</label>
-                            <select id="ch3_attn" name="ch3_attn" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0" selected>0 dB</option>
-                                <option value="1">2.5 dB</option>
-                                <option value="2">6 dB</option>
-                                <option value="3">11 dB</option>
-                            </select>
-                        </div> -->
+                <div class="form-row">
+                    <div>
+                        <label for="ch1name">Channel Name</label>
+                        <input type="text" id="ch1name" value="Channel_1" required>
                     </div>
-                    <div class="flex items-center pt-2">
-                        <input id="ch3_enabled" name="ch3_enabled" type="checkbox" checked
-                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label for="ch3_enabled" class="ml-2 font-medium text-gray-700 text-sm">Enable Channel 3</label>
+                    <div>
+                        <label for="ch1samplingRate">Sampling Rate (ms)</label>
+                        <input type="number" id="ch1samplingRate" min="1" value="1000" required>
+                    </div>
+                    <div>
+                        <label for="ch1resolution">Resolution</label>
+                        <select id="ch1resolution" required>
+                            <option value="9">9-bit</option>
+                            <option value="10">10-bit</option>
+                            <option value="11">11-bit</option>
+                            <option value="12" selected>12-bit</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ch1attenuation">Voltage Range</label>
+                        <select id="ch1attenuation" required>
+                            <option value="0">0dB (0-1.1V)</option>
+                            <option value="1">2.5dB (0-1.5V)</option>
+                            <option value="2">6dB (0-2.2V)</option>
+                            <option value="3" selected>11dB (0-3.3V)</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="p-6 border border-gray-200 rounded-lg mb-6 bg-gray-50 space-y-6-channel">
-                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Channel 4 Settings</h3>
-                    <div class="grid md:grid-cols-4 gap-6">
-                        <div>
-                            <label for="ch4_name" class="block text-sm font-medium text-gray-700 mb-1">Channel Name</label>
-                            <input type="text" id="ch4_name" name="ch4_name" value="Aux_D" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                         <div>
-                            <label for="ch4_samplingRate" class="block text-sm font-medium text-gray-700 mb-1">Sampling Rate (Hz)</label>
-                            <input type="number" id="ch4_samplingRate" name="ch4_samplingRate" min="1" value="100" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 input-focus">
-                        </div>
-                        <div>
-                            <label for="ch4_resolution" class="block text-sm font-medium text-gray-700 mb-1">Resolution (Bits)</label>
-                            <select id="ch4_resolution" name="ch4_resolution" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="9">9-bit</option>
-                                <option value="10">10-bit</option>
-                                <option value="11" selected>11-bit</option>
-                                <option value="12">12-bit</option>
-                            </select>
-                        </div>
-                        <!-- <div>
-                            <label for="ch4_attn" class="block text-sm font-medium text-gray-700 mb-1">Attenuation</label>
-                            <select id="ch4_attn" name="ch4_attn" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0">0 dB</option>
-                                <option value="1" selected>2.5 dB</option>
-                                <option value="2">6 dB</option>
-                                <option value="3">11 dB</option>
-                            </select>
-                        </div> -->
+                <div class="form-row">
+                    <div>
+                        <label for="ch1unit">Unit</label>
+                        <input type="text" id="ch1unit" value="raw">
                     </div>
-                    <div class="flex items-center pt-2">
-                        <input id="ch4_enabled" name="ch4_enabled" type="checkbox"
-                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
-                        <label for="ch4_enabled" class="ml-2 font-medium text-gray-700 text-sm">Enable Channel 4</label>
+                    <div>
+                        <label for="ch1calibScale">Calibration Scale</label>
+                        <input type="number" id="ch1calibScale" step="0.000001" value="1.0">
+                    </div>
+                    <div>
+                        <label for="ch1calibOffset">Calibration Offset</label>
+                        <input type="number" id="ch1calibOffset" step="0.01" value="0.0">
                     </div>
                 </div>
 
-                <div class="pt-4 flex justify-between items-center border-t">
-                    <a href="/data_page.html" class="w-auto bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center">
-                        &larr; Back to Main
-                    </a>
-                    <button type="submit" onclick="submitJsonForm()" class="w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center">
-                        Save Parameters &rarr;
-                    </button>
+                <div class="helper">
+                    <strong>Quick Guide:</strong> Voltage divider (0-12V): Scale=0.00293, Offset=0 | Current sensor: Scale=0.00806, Offset=-3100
                 </div>
-            </form>
 
-        </main>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="ch1enabled" checked>
+                    <label for="ch1enabled">Enable Channel 1</label>
+                </div>
+            </div>
+
+            <!-- Channel 2 -->
+            <div class="channel-box">
+                <h3>Channel 2 Settings</h3>
+                
+                <div class="form-row">
+                    <div>
+                        <label for="ch2name">Channel Name</label>
+                        <input type="text" id="ch2name" value="Channel_2" required>
+                    </div>
+                    <div>
+                        <label for="ch2samplingRate">Sampling Rate (ms)</label>
+                        <input type="number" id="ch2samplingRate" min="1" value="1000" required>
+                    </div>
+                    <div>
+                        <label for="ch2resolution">Resolution</label>
+                        <select id="ch2resolution" required>
+                            <option value="9">9-bit</option>
+                            <option value="10">10-bit</option>
+                            <option value="11">11-bit</option>
+                            <option value="12" selected>12-bit</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ch2attenuation">Voltage Range</label>
+                        <select id="ch2attenuation" required>
+                            <option value="0">0dB (0-1.1V)</option>
+                            <option value="1">2.5dB (0-1.5V)</option>
+                            <option value="2">6dB (0-2.2V)</option>
+                            <option value="3" selected>11dB (0-3.3V)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label for="ch2unit">Unit</label>
+                        <input type="text" id="ch2unit" value="raw">
+                    </div>
+                    <div>
+                        <label for="ch2calibScale">Calibration Scale</label>
+                        <input type="number" id="ch2calibScale" step="0.000001" value="1.0">
+                    </div>
+                    <div>
+                        <label for="ch2calibOffset">Calibration Offset</label>
+                        <input type="number" id="ch2calibOffset" step="0.01" value="0.0">
+                    </div>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="ch2enabled" checked>
+                    <label for="ch2enabled">Enable Channel 2</label>
+                </div>
+            </div>
+
+            <!-- Channel 3 -->
+            <div class="channel-box">
+                <h3>Channel 3 Settings</h3>
+                
+                <div class="form-row">
+                    <div>
+                        <label for="ch3name">Channel Name</label>
+                        <input type="text" id="ch3name" value="Channel_3" required>
+                    </div>
+                    <div>
+                        <label for="ch3samplingRate">Sampling Rate (ms)</label>
+                        <input type="number" id="ch3samplingRate" min="1" value="1000" required>
+                    </div>
+                    <div>
+                        <label for="ch3resolution">Resolution</label>
+                        <select id="ch3resolution" required>
+                            <option value="9">9-bit</option>
+                            <option value="10">10-bit</option>
+                            <option value="11">11-bit</option>
+                            <option value="12" selected>12-bit</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ch3attenuation">Voltage Range</label>
+                        <select id="ch3attenuation" required>
+                            <option value="0">0dB (0-1.1V)</option>
+                            <option value="1">2.5dB (0-1.5V)</option>
+                            <option value="2">6dB (0-2.2V)</option>
+                            <option value="3" selected>11dB (0-3.3V)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label for="ch3unit">Unit</label>
+                        <input type="text" id="ch3unit" value="raw">
+                    </div>
+                    <div>
+                        <label for="ch3calibScale">Calibration Scale</label>
+                        <input type="number" id="ch3calibScale" step="0.000001" value="1.0">
+                    </div>
+                    <div>
+                        <label for="ch3calibOffset">Calibration Offset</label>
+                        <input type="number" id="ch3calibOffset" step="0.01" value="0.0">
+                    </div>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="ch3enabled">
+                    <label for="ch3enabled">Enable Channel 3</label>
+                </div>
+            </div>
+
+            <!-- Channel 4 -->
+            <div class="channel-box">
+                <h3>Channel 4 Settings</h3>
+                
+                <div class="form-row">
+                    <div>
+                        <label for="ch4name">Channel Name</label>
+                        <input type="text" id="ch4name" value="Channel_4" required>
+                    </div>
+                    <div>
+                        <label for="ch4samplingRate">Sampling Rate (ms)</label>
+                        <input type="number" id="ch4samplingRate" min="1" value="1000" required>
+                    </div>
+                    <div>
+                        <label for="ch4resolution">Resolution</label>
+                        <select id="ch4resolution" required>
+                            <option value="9">9-bit</option>
+                            <option value="10">10-bit</option>
+                            <option value="11">11-bit</option>
+                            <option value="12" selected>12-bit</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ch4attenuation">Voltage Range</label>
+                        <select id="ch4attenuation" required>
+                            <option value="0">0dB (0-1.1V)</option>
+                            <option value="1">2.5dB (0-1.5V)</option>
+                            <option value="2">6dB (0-2.2V)</option>
+                            <option value="3" selected>11dB (0-3.3V)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label for="ch4unit">Unit</label>
+                        <input type="text" id="ch4unit" value="raw">
+                    </div>
+                    <div>
+                        <label for="ch4calibScale">Calibration Scale</label>
+                        <input type="number" id="ch4calibScale" step="0.000001" value="1.0">
+                    </div>
+                    <div>
+                        <label for="ch4calibOffset">Calibration Offset</label>
+                        <input type="number" id="ch4calibOffset" step="0.01" value="0.0">
+                    </div>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="ch4enabled" checked>
+                    <label for="ch4enabled">Enable Channel 4</label>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="button-row">
+                <a href="/data_page.html" class="btn btn-secondary">← Back</a>
+                <button type="submit" class="btn btn-primary">Save Parameters →</button>
+            </div>
+        </form>
     </div>
 
     <script>
-        function submitJsonForm() {
-            const form = document.getElementById('parameterForm');
-            // Prevent standard form submission
-            event.preventDefault(); 
+        // Load existing config
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/config.json');
+                const config = await res.json();
+                
+                config.channels.forEach((ch, i) => {
+                    const n = i + 1;
+                    document.getElementById(`ch${n}name`).value = ch.name || '';
+                    document.getElementById(`ch${n}samplingRate`).value = ch.samplingRate || 1000;
+                    document.getElementById(`ch${n}resolution`).value = ch.resolution || 12;
+                    document.getElementById(`ch${n}attenuation`).value = ch.attenuation || 3;
+                    document.getElementById(`ch${n}unit`).value = ch.unit || 'raw';
+                    document.getElementById(`ch${n}calibScale`).value = ch.calibration_scale || 1.0;
+                    document.getElementById(`ch${n}calibOffset`).value = ch.calibration_offset || 0.0;
+                    document.getElementById(`ch${n}enabled`).checked = ch.enabled || false;
+                });
+            } catch (e) {
+                console.log('Using default values');
+            }
+        });
 
-            const data = {
-                channels: [] 
-            };
+        // Submit handler
+        document.getElementById('parameterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            // Collect data for Channels 1 through 4
+            const data = { channels: [] };
+            
             for (let i = 1; i <= 4; i++) {
-                const name = document.getElementById(`ch${i}_name`).value;
-                // Parse numbers to ensure they are sent as JSON numbers, not strings
-                const samplingRate = parseInt(document.getElementById(`ch${i}_samplingRate`).value);
-                const resolution = parseInt(document.getElementById(`ch${i}_resolution`).value);
-                // const attenuation = parseInt(document.getElementById(`ch${i}_attn`).value);
-                // The .checked property ensures we send a boolean true/false
-                const enabled = document.getElementById(`ch${i}_enabled`).checked; 
-
                 data.channels.push({
-                    // Use the channel number as the ID (1, 2, 3, 4)
-                    id: i, 
-                    name: name,
-                    enabled: enabled,
-                    samplingRate: samplingRate,
-                    resolution: resolution,
+                    id: i,
+                    name: document.getElementById(`ch${i}name`).value,
+                    enabled: document.getElementById(`ch${i}enabled`).checked,
+                    samplingRate: parseInt(document.getElementById(`ch${i}samplingRate`).value),
+                    resolution: parseInt(document.getElementById(`ch${i}resolution`).value),
+                    attenuation: parseInt(document.getElementById(`ch${i}attenuation`).value),
+                    unit: document.getElementById(`ch${i}unit`).value,
+                    calibration_scale: parseFloat(document.getElementById(`ch${i}calibScale`).value),
+                    calibration_offset: parseFloat(document.getElementById(`ch${i}calibOffset`).value)
                 });
             }
-
-            // Convert the JavaScript object to a JSON string for the ESP32
-            const jsonPayload = JSON.stringify(data);
-
-            // Use the fetch API to send the JSON data
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonPayload
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Parameters saved successfully! The device may restart to apply logging changes.');
+            
+            try {
+                const res = await fetch('/save-parameters', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (res.ok) {
+                    alert('Configuration saved successfully!');
                 } else {
-                    alert('Error saving parameters. Server returned: ' + response.status);
+                    alert('Error saving configuration.');
                 }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                alert('A network error occurred while submitting data. Is the ESP32 access point running?');
-            });
-        }
+            } catch (err) {
+                alert('Network error. Is ESP32 AP running?');
+            }
+        });
     </script>
-
 </body>
 </html>
