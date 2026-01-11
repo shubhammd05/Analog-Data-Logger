@@ -90,7 +90,6 @@ bool processJsonConfig(AsyncWebServerRequest *request, uint8_t *data, size_t len
 
 // Web handlers
 void handleFileRequest(String path, String contentType, AsyncWebServerRequest *request);
-void handleConfig(AsyncWebServerRequest *request);
 void handleFileList(AsyncWebServerRequest *request);
 void handleNotFound(AsyncWebServerRequest *request);
 
@@ -651,13 +650,14 @@ void handleFileList(AsyncWebServerRequest *request) {
 void startAccessPoint() {
     DEBUG_PRINTLN("Starting Access Point...");
     setCpuFrequencyMhz(CPU_FREQ_WIFI);
-    indicateAPMode();
     
     WiFi.softAP(AP_SSID, AP_PASSWORD);
     IPAddress apIP = WiFi.softAPIP();
-
+    
     apStartTime = millis();
     isApTimeoutEnabled = true;
+    
+    indicateAPMode();
 
     dnsServer.start(DNS_PORT, "*", apIP);
     server.begin();

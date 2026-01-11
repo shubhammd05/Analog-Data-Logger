@@ -205,7 +205,6 @@
     // --- LOGIC ---
     async function loadConfig() {
         try {
-            // FIX: Added timestamp to prevent caching so Unit updates immediately
             const res = await fetch('/config.json?t=' + Date.now());
             return res.ok ? (await res.json()).channels || [] : [];
         } catch (e) { return []; }
@@ -228,7 +227,7 @@
                 data.channels.forEach(ch => {
                     const opt = document.createElement('option');
                     opt.value = ch.filename; 
-                    opt.textContent = `${ch.name} (${ch.filename})`;
+                    opt.textContent = `${ch.name}`;
                     sel.appendChild(opt);
                 });
                 log(`Loaded ${data.channels.length} files.`);

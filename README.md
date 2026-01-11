@@ -1,19 +1,16 @@
-```markdown
 # [Analog-Data-Logger](https://github.com/siddharth11010/Analog-Data-Logger)
 
 [![GitHub](https://img.shields.io/badge/GitHub-Analog--Data--Logger-blue?logo=github)](https://github.com/siddharth11010/Analog-Data-Logger)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-ESP32-orange.svg)](https://platformio.org)
-[![Version](https://img.shields.io/badge/Version-2.0-blue.svg)](https://github.com/siddharth11010/Analog-Data-Logger/releases)
-
-> **ESP32 4-Channel Data Logger** - 
+[![Version](https://img.shields.io/badge/Version-1.0-blue.svg)](https://github.com/siddharth11010/Analog-Data-Logger/releases)
 
 ---
 
 # ESP32 4-Channel Data Logger
+
 ## Comprehensive Documentation Guide
 
-**Version:** 2.0  
+**Version:** 1.0  
 **Date:** January 11, 2026  
 **Status:** Production Ready  
 **Firmware Version:** 1.0.0
@@ -78,7 +75,7 @@ The **ESP32 4-Channel Data Logger** is a professional-grade data acquisition sys
 | Clock Speed | 240 MHz (WiFi), 80 MHz (Logging) |
 | RAM | 520 KB SRAM |
 | Flash Storage | 4 MB |
-| ADC Channels | 2x 12-bit SAR (18 pins total) |
+| ADC Channels | 2× 12-bit SAR (18 pins total) |
 | Resolution | 9-12 bits (configurable per channel) |
 
 ### 2.2 Peripheral Modules
@@ -216,36 +213,36 @@ Offset = 0.0
 ### 4.1 Dual-Core Task Distribution
 
 ```
-┌─────────────────────────────────────────────────┐
-│               Core 1: Real-Time                 │
-│  ┌───────────────────────────────────────────┐  │
-│  │   Logging Tasks (Ch1-4)                   │  │
-│  │   -  Acquire Mutex                        │  │
-│  │   -  Read ADC Sensors                     │  │
-│  │   -  Write to SD Card                     │  │
-│  │   -  Release Mutex                        │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────┐
+│                 Core 1: Real-Time                 │
+│   ┌───────────────────────────────────────────┐   │
+│   │   Logging Tasks (Ch1-4)                   │   │
+│   │   • Acquire Mutex                         │   │
+│   │   • Read ADC Sensors                      │   │
+│   │   • Write to SD Card                      │   │
+│   │   • Release Mutex                         │   │
+│   └───────────────────────────────────────────┘   │
+└───────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────┐
-│               Core 0: Background                │
-│  ┌───────────────────────────────────────────┐  │
-│  │   System Monitor Task                     │  │
-│  │   -  Check SD Space (every 5s)            │  │
-│  │   -  Update LED Status (every 200ms)      │  │
-│  └───────────────────────────────────────────┘  │
-│  ┌───────────────────────────────────────────┐  │
-│  │   WiFi & Web Server                       │  │
-│  │   -  Handle HTTP Requests                 │  │
-│  │   -  Stream Files from SD                 │  │
-│  │   -  DNS Captive Portal                   │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────┐
+│                Core 0: Background                 │
+│   ┌───────────────────────────────────────────┐   │
+│   │   System Monitor Task                     │   │
+│   │   • Check SD Space (every 5s)             │   │
+│   │   • Update LED Status (every 200ms)       │   │
+│   └───────────────────────────────────────────┘   │
+│   ┌───────────────────────────────────────────┐   │
+│   │   WiFi & Web Server                       │   │
+│   │   • Handle HTTP Requests                  │   │
+│   │   • Stream Files from SD                  │   │
+│   │   • DNS Captive Portal                    │   │
+│   └───────────────────────────────────────────┘   │
+└───────────────────────────────────────────────────┘
 
-                ┌──────────────┐
-                │ Mutex Lock   │
-                │ (SD Access)  │
-                └──────────────┘
+                    ┌──────────────┐
+                    │ Mutex Lock   │
+                    │ (SD Access)  │
+                    └──────────────┘
 ```
 
 ### 4.2 FreeRTOS Task Configuration
@@ -288,16 +285,19 @@ This design eliminates file locks and allows uninterrupted data acquisition.
 ### 5.1 Prerequisites
 
 **Development Environment:**
-- VS Code with PlatformIO extension
+
+- PlatformIO 
 - Python 3.7+ (for PlatformIO)
 - Git (optional)
 
 **Hardware:**
+
 - ESP32 DevKit V1 or NodeMCU-32S
 - USB cable (Type-B or Micro-USB)
 - Working USB port
 
 **Libraries (auto-installed by PlatformIO):**
+
 - Arduino-ESP32 core
 - RTClib (Adafruit)
 - ArduinoJson 6.x
@@ -310,31 +310,35 @@ This design eliminates file locks and allows uninterrupted data acquisition.
 
 ```bash
 # Create new project
-platformio init --board esp32dev --framework arduino
+platformio init --board nodemcu-32s --framework arduino
 
 # Or open existing project
-cd esp32-data-logger
+cd Analog-Data-Logger
 ```
 
 #### Step 2: Configure platformio.ini
 
 ```ini
-[env:esp32dev]
+[env:nodemcu-32s]
 platform = espressif32
-board = esp32dev
+board = nodemcu-32s
 framework = arduino
-upload_speed = 921600
-monitor_speed = 115200
+monitor_speed = 9600
+lib_deps = 
+	adafruit/RTClib@^2.1.4
+	djuseeq/Ch376msc@^1.4.5
+	# Core Async Libraries
+    AsyncTCP@^1.1.1
+    ESP Async WebServer@^1.2.3
+    # JSON Parsing Library
+    bblanchon/ArduinoJson@^6.19.4 ; Or the latest version, ensure it's V6 or V7
+    # Filesystem
+    # earlephilhower/LittleFS@^0.6.0 
 
-lib_deps =
-    RTClib
-    ArduinoJson@^6.19.0
-    me-no-dev/AsyncTCP
-    me-no-dev/ESP Async WebServer
+board_build.filesystem = littlefs
+board_build.partitions = default.csv
 
-build_flags =
-    -DCORE_DEBUG_LEVEL=0
-    -DDEBUG=1
+build_flags = -D ASYNCWEBSERVER_REGEX
 ```
 
 #### Step 3: Project Structure
@@ -488,16 +492,20 @@ Expected serial output:
 ### 6.4 Debug Mode Configuration
 
 **Firmware Debug (Config.h):**
+
 ```cpp
 #define DEBUG 1  // Set to 0 for production
 ```
+
 - **Effect:** Enables/Disables serial output
 - **Usage:** Set to 1 during development, 0 for deployment
 
 **Web Interface Debug (data_page.html):**
+
 ```javascript
 const DEBUG = false;  // Set to true to show log box
 ```
+
 - **Effect:** Shows/Hides system log in browser
 - **Usage:** Set to true for troubleshooting API calls
 
@@ -512,6 +520,7 @@ Calibrated_Value = (Raw_ADC × Scale) + Offset
 ```
 
 **Where:**
+
 - **Raw_ADC:** 0-4095 (12-bit) or 0-511 (9-bit)
 - **Scale:** Conversion factor (volts/amps/°C per count)
 - **Offset:** Zero-point or bias correction
@@ -519,6 +528,7 @@ Calibrated_Value = (Raw_ADC × Scale) + Offset
 ### 7.2 Battery Voltage Monitoring (0-12V)
 
 **Circuit:**
+
 ```
 12V ───[27kΩ]───+───[10kΩ]─── GND
                 │
@@ -526,6 +536,7 @@ Calibrated_Value = (Raw_ADC × Scale) + Offset
 ```
 
 **Calculation:**
+
 ```
 Voltage divider ratio = R2 / (R1 + R2) = 10k / (27k + 10k) = 0.27027
 
@@ -540,6 +551,7 @@ Offset = 0.0
 ```
 
 **Configuration:**
+
 ```json
 {
   "calibration_scale": 0.002985,
@@ -552,11 +564,13 @@ Offset = 0.0
 ### 7.3 Current Sensor (ACS712 ±5A)
 
 **Datasheet Specifications:**
+
 - Sensitivity: 185 mV/A
 - Zero current output: 2.5V (Vcc/2)
 - Bidirectional: ±5A range
 
 **Calculation:**
+
 ```
 At ±5A range:
 -5A → 2.5V - (5 × 0.185V) = 1.575V → ~1950 counts
@@ -568,6 +582,7 @@ Offset = -3100 (subtract zero point)
 ```
 
 **Configuration:**
+
 ```json
 {
   "calibration_scale": 0.00435,
@@ -580,11 +595,13 @@ Offset = -3100 (subtract zero point)
 ### 7.4 Temperature Sensor (LM35)
 
 **Datasheet Specifications:**
+
 - Output: 10 mV/°C
 - 0°C → 0V
 - 100°C → 1V
 
 **Calculation:**
+
 ```
 Using ADC_0db attenuation (0-1.1V range):
 100°C = 1.0V → (1.0V / 1.1V) × 4095 = 3723 counts
@@ -594,6 +611,7 @@ Offset = 0.0
 ```
 
 **Configuration:**
+
 ```json
 {
   "calibration_scale": 0.02686,
@@ -608,24 +626,29 @@ Offset = 0.0
 For custom or unknown sensors:
 
 **Step 1:** Measure at known point 1
+
 - Apply known input (e.g., 0V reference)
 - Record ADC reading: ADC₁
 
 **Step 2:** Measure at known point 2
+
 - Apply different known input (e.g., 3.3V)
 - Record ADC reading: ADC₂
 
 **Step 3:** Calculate scale
+
 ```
 Scale = (Input₂ - Input₁) / (ADC₂ - ADC₁)
 ```
 
 **Step 4:** Calculate offset
+
 ```
 Offset = Input₁ - (ADC₁ × Scale)
 ```
 
 **Example:**
+
 ```
 Point 1: 0V input → ADC reads 50 counts (due to noise/bias)
 Point 2: 3.3V input → ADC reads 4090 counts
@@ -641,11 +664,13 @@ Offset = 0 - (50 × 0.000817) = -0.0409 V
 ### 8.1 CSV File Structure
 
 **Header Row:**
+
 ```csv
 Year,Month,Date,Hour,Minute,Second,Millisecond,Value
 ```
 
 **Example Data:**
+
 ```csv
 2026,1,11,15,30,45,123,2048
 2026,1,11,15,30,46,125,2051
@@ -670,6 +695,7 @@ Year,Month,Date,Hour,Minute,Second,Millisecond,Value
 ### 8.3 File System Layout
 
 **SD Card:**
+
 ```
 /
 ├── LOG_01.csv    ┐
@@ -683,6 +709,7 @@ Year,Month,Date,Hour,Minute,Second,Millisecond,Value
 ```
 
 **LittleFS (Internal Flash):**
+
 ```
 /
 ├── config.json          (Configuration - persistent)
@@ -748,6 +775,7 @@ plt.show()
 ### 9.1 Accessing the System
 
 **Trigger WiFi Mode:**
+
 1. Press **Upload Button** (GPIO27) for 3 seconds
 2. **Blue LED** turns on
 3. WiFi AP broadcasts: `ESP32-Data-Fetcher`
@@ -755,12 +783,14 @@ plt.show()
 **Connect Device:**
 
 **Mobile Phone (iOS/Android):**
+
 1. Settings → WiFi
 2. Select `ESP32-Data-Fetcher`
 3. Enter password: `password`
 4. Captive portal opens automatically
 
 **Laptop/Desktop:**
+
 1. WiFi Networks → `ESP32-Data-Fetcher`
 2. Password: `password`
 3. Open browser → `http://192.168.4.1`
@@ -772,6 +802,7 @@ plt.show()
 **Purpose:** Download and visualize logged data
 
 **Features:**
+
 - List of available log files
 - Real-time CSV preview
 - Interactive Chart.js visualization
@@ -785,6 +816,7 @@ plt.show()
 **Purpose:** Configure channels and sampling
 
 **Features:**
+
 - Enable/disable individual channels
 - Set sampling rates
 - Adjust calibration factors
@@ -797,11 +829,13 @@ plt.show()
 ### 9.3 WiFi Security & Timeout
 
 **Current Security:**
+
 - SSID: `ESP32-Data-Fetcher`
 - Password: `password`
 - ⚠️ **Warning:** Change default password for production use
 
 **Auto-Timeout:**
+
 - AP stays active for 5 minutes maximum
 - Automatically closes after timeout
 - Also closes when last client disconnects
@@ -817,6 +851,7 @@ plt.show()
 **Description:** Returns list of available log files
 
 **Response:**
+
 ```json
 {
   "channels": [
@@ -839,6 +874,7 @@ plt.show()
 **Description:** Stream CSV file with chunked transfer
 
 **Parameters:**
+
 - `file`: Filename (e.g., `LOG_05.csv`)
 
 **Example:** `http://192.168.4.1/api/stream?file=LOG_05.csv`
@@ -858,6 +894,7 @@ plt.show()
 **Request Body:** JSON (same format as config.json)
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -870,6 +907,7 @@ plt.show()
 **Description:** Clear log file for specified channel
 
 **Parameters:**
+
 - `ch`: Channel number (1-4)
 
 **Example:** `http://192.168.4.1/clear?ch=1`
@@ -900,13 +938,13 @@ curl -X POST http://192.168.4.1/save-parameters \
 
 ### 11.1 LED Color Codes
 
-| Color | Status |
-|-------|--------|
-| **🟢 Green** | Logging active, SD OK |
-| **🔴 Red** | Logging paused (switch OFF) |
-| **🔵 Blue** | WiFi AP Mode active |
-| **🟡 Yellow** | Low SD space (>50% full) |
-| **🟣 Magenta** (blink) | SD Full (<10MB) or error |
+| Color | Pattern | Meaning | Priority |
+|-------|---------|---------|----------|
+| 🟢 Green | Solid | Normal logging, SD OK | Low |
+| 🔴 Red | Solid | Logging paused (switch OFF) or initialization | Low |
+| 🔵 Blue | Solid | WiFi AP Mode active | High |
+| 🟡 Yellow | Solid | Low SD space (>50% full) | Medium |
+| 🟣 Magenta | Flickering | SD Full (<10MB) or error | Critical |
 
 ### 11.2 LED Priority Logic
 
@@ -953,20 +991,21 @@ SemaphoreHandle_t mutex;       // SD card access mutex
 bool sdCardIsReady = false;    // SD initialization status
 bool isSdFull = false;         // SD space critical flag
 bool isApActive = false;       // WiFi AP mode active
-ChannelConfig channels;     // Configuration for all 4 channels
+ChannelConfig channels[4];     // Configuration for all 4 channels
 ```
 
 ### 12.3 Key Functions
 
 **SD Card Status Check:**
+
 ```cpp
 int checkSdCardStatus() {
     if (!SD.totalBytes()) return 2;  // Error
-    
+
     uint64_t total = SD.totalBytes();
     uint64_t used = SD.usedBytes();
     uint64_t free = total - used;
-    
+
     if (free < 10*1024*1024) return 2;  // Critical (<10MB)
     if (used > (total/2)) return 1;      // Low (>50%)
     return 0;                            // OK
@@ -974,6 +1013,7 @@ int checkSdCardStatus() {
 ```
 
 **LED Control:**
+
 ```cpp
 void setLedColor(bool r, bool g, bool b) {
     digitalWrite(LEDR, r ? HIGH : LOW);
@@ -983,17 +1023,18 @@ void setLedColor(bool r, bool g, bool b) {
 ```
 
 **Logging Task:**
+
 ```cpp
 void LogChannelTask(void* parameter) {
     int chId = (int)parameter;
     ChannelConfig &cfg = channels[chId - 1];
-    
+
     for (;;) {
         if (cfg.enabled && !isSdFull && !digitalRead(SWITCH)) {
             uint16_t raw = analogRead(getAdcPin(chId));
             DateTime now = rtc.now();
             String line = formatCsvLine(now, raw);
-            
+
             if (xSemaphoreTake(mutex, pdMS_TO_TICKS(1000)) == pdTRUE) {
                 File file = SD.open(getLogFile(chId), FILE_APPEND);
                 if (file) {
@@ -1014,10 +1055,10 @@ To change sampling rates programmatically:
 
 ```cpp
 // In setup() or via web interface
-channels.samplingRate = 500;   // 500ms = 2 samples/second
-channels.samplingRate = 1000;  // 1 second[2]
-channels.samplingRate = 5000;  // 5 seconds[3]
-channels.samplingRate = 100;   // 100ms = 10 samples/second[4]
+channels[0].samplingRate = 500;   // 500ms = 2 samples/second
+channels[1].samplingRate = 1000;  // 1 second
+channels[2].samplingRate = 5000;  // 5 seconds
+channels[3].samplingRate = 100;   // 100ms = 10 samples/second
 
 // Save to config.json
 saveConfigToLittleFS();
@@ -1026,21 +1067,25 @@ saveConfigToLittleFS();
 ### 12.5 Adding New Sensors
 
 **Step 1:** Determine sensor specifications
+
 - Output voltage range
 - Sensitivity/scale factor
 - Zero-point offset
 
 **Step 2:** Design voltage divider (if needed)
+
 - Ensure ADC input < 3.3V
 - Calculate resistor values
 
 **Step 3:** Calculate calibration factors
+
 ```cpp
 float scale = (MaxValue - MinValue) / (MaxADC - MinADC);
 float offset = MinValue - (MinADC * scale);
 ```
 
 **Step 4:** Update configuration
+
 ```json
 {
   "id": 1,
@@ -1066,6 +1111,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** LittleFS not initialized or SD card missing
 
 **Solutions:**
+
 1. Check USB cable and power supply
 2. Re-upload filesystem: `platformio run --target uploadfs`
 3. Ensure SD card inserted and formatted as FAT32
@@ -1077,6 +1123,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** DS3231 not detected on I2C bus
 
 **Solutions:**
+
 1. Verify I2C connections (SDA→GPIO21, SCL→GPIO22)
 2. Check 4.7kΩ pullup resistors on SDA/SCL
 3. Test RTC battery (CR2032)
@@ -1088,6 +1135,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** SD card module not responding
 
 **Solutions:**
+
 1. Check SPI wiring (CS, MOSI, MISO, SCK)
 2. Verify 3.3V power to SD module
 3. Format SD card as FAT32
@@ -1101,6 +1149,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** Button not registering or WiFi disabled
 
 **Solutions:**
+
 1. Hold upload button for 3+ seconds
 2. Check serial for "Starting Access Point..."
 3. Verify GPIO27 button wiring
@@ -1112,6 +1161,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** OS security or browser not recognizing portal
 
 **Solutions:**
+
 1. Disable mobile data
 2. Manually browse to `http://192.168.4.1`
 3. Try different device
@@ -1123,6 +1173,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** LittleFS not mounted or corrupted
 
 **Solutions:**
+
 1. Check serial: "LittleFS Initialized"
 2. Re-upload filesystem
 3. Verify `/data/` folder contents
@@ -1136,6 +1187,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** Logging disabled or ADC not reading
 
 **Solutions:**
+
 1. Check logging switch (GPIO15) - must be LOW
 2. Verify channel enabled in config.json
 3. Check ADC input voltage < 3.3V
@@ -1147,6 +1199,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** Sampling rate too fast or SD corruption
 
 **Solutions:**
+
 1. Reduce sampling rate (increase interval)
 2. Reformat SD card (FAT32)
 3. Verify adequate power (500mA minimum)
@@ -1158,6 +1211,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** RTC not set or battery dead
 
 **Solutions:**
+
 1. Check RTC battery installed (CR2032)
 2. Set RTC time via web interface
 3. Verify I2C communication
@@ -1171,6 +1225,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** Insufficient power or memory
 
 **Solutions:**
+
 1. Use 5V/1A power supply
 2. Reduce sampling rates
 3. Increase task stack sizes
@@ -1182,6 +1237,7 @@ float offset = MinValue - (MinADC * scale);
 **Cause:** Large files or weak WiFi
 
 **Solutions:**
+
 1. Clear old log files
 2. Reduce file group size
 3. Move closer to ESP32
@@ -1218,27 +1274,29 @@ float offset = MinValue - (MinADC * scale);
 ### 14.3 File Format Standards
 
 **CSV:**
+
 - Line Endings: LF (Unix)
 - Delimiter: Comma (,)
 - Encoding: UTF-8
 - No quotes on numeric values
 
 **JSON:**
+
 - Format: Pretty-printed
 - Encoding: UTF-8
 - Max Size: 2048 bytes
 
 ### 14.4 Recommended Components
 
-| Component | Supplier | Notes |
-|-----------|----------|-------|
-| ESP32 NodeMCU | AliExpress, Amazon | Verify ESP32 (not ESP8266) |
-| DS3231 RTC | Amazon, AliExpress | Includes CR2032 battery |
-| MicroSD Module | Amazon | 3.3V or level shifter |
-| MicroSD Card | SanDisk, Samsung | Class 10, FAT32 |
-| RGB LED | Local electronics | Common cathode, 5mm |
-| Resistors (330Ω) | Local electronics | 1/4W carbon film |
-| Buttons | Local electronics | Tactile push button |
+| Component | Notes |
+|----------|-------|
+| ESP32 NodeMCU | Verify ESP32 (not ESP8266) |
+| DS3231 RTC | Includes CR2032 battery |
+| MicroSD Module | 3.3V or level shifter |
+| MicroSD Card | Class 10, FAT32 |
+| RGB LED | Common cathode, 5mm |
+| Resistors (330Ω) | 1/4W carbon film |
+| Buttons | Tactile push button |
 
 ---
 
@@ -1247,6 +1305,7 @@ float offset = MinValue - (MinADC * scale);
 ### A. Quick Reference Card
 
 **Pin Connections:**
+
 - ADC: GPIO34, 35, 32, 33
 - Control: GPIO27 (button), GPIO15 (switch)
 - LED: GPIO16, 17, 4
@@ -1254,11 +1313,13 @@ float offset = MinValue - (MinADC * scale);
 - RTC: GPIO21 (SDA), 22 (SCL)
 
 **WiFi Credentials:**
+
 - SSID: ESP32-Data-Fetcher
 - Password: password
-- IP: http://192.168.4.1
+- IP: <http://192.168.4.1>
 
 **LED Colors:**
+
 - Green = Normal
 - Red = Paused
 - Blue = WiFi
@@ -1268,17 +1329,20 @@ float offset = MinValue - (MinADC * scale);
 ### B. Calibration Cheat Sheet
 
 **Voltage Divider:**
+
 ```
 Scale = V_max / ADC_at_Vmax
 ```
 
 **Current Sensor:**
+
 ```
 Scale = Current_range / (ADC_max - ADC_min)
 Offset = -ADC_at_zero
 ```
 
 **Temperature:**
+
 ```
 Scale = Temp_range / ADC_range
 ```
@@ -1295,21 +1359,10 @@ Scale = Temp_range / ADC_range
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Document Version:** 1.0  
+**Last Updated:** January 11, 2026  
+**Maintained By:** ESP32 Data Logger Project  
+**License:** Commercial  
 
 ---
 
@@ -1330,17 +1383,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<div align="center">
+## 🤝 Contributing
 
-**Document Version:** 2.0  
-**Last Updated:** January 11, 2026  
-**Maintained By:** [siddharth11010](https://github.com/siddharth11010)
+Contributions are welcome! Please follow these steps:
 
-[![⭐ Star this repo](https://img.shields.io/github/stars/siddharth11010/Analog-Data-Logger?style=social)](https://github.com/siddharth11010/Analog-Data-Logger)
-[![🍴 Fork this repo](https://img.shields.io/github/forks/siddharth11010/Analog-Data-Logger?style=social)](https://github.com/siddharth11010/Analog-Data-Logger/fork)
-
-*Built with ❤️ for the embedded systems community*
-
-</div>
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
