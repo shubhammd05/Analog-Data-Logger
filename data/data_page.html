@@ -155,7 +155,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-md p-6 debug-container"> 
+            <div id="debug-container" class="bg-white rounded-lg shadow-md p-6 debug-container"> 
                 <div class="flex-row-spaced mb-2">
                     <h3 class="text-xl">System Log</h3>
                     <button onclick="document.getElementById('debug-log').textContent=''" class="btn-small">Clear Log</button>
@@ -168,7 +168,7 @@
 
 <script>
     // --- CONFIG ---
-    const DEBUG = true; 
+    const DEBUG = false; 
 
     let chart = null;
     const timestamps = [];
@@ -212,9 +212,13 @@
     }
 
     window.addEventListener('load', async () => {
+        
+        if (!DEBUG) {
+            document.getElementById('debug-container').style.display = 'none';
+        }
+
         log('Fetching file list...');
         try {
-            // FIX: Added timestamp to file list as well
             const res = await fetch('/api/files?t=' + Date.now());
             const data = await res.json();
             const sel = document.getElementById('fileSelector');
