@@ -28,7 +28,7 @@
         /* --- RESPONSIVE HEADER --- */
         .header-container {
             display: flex;
-            flex-wrap: wrap; /* Allows wrapping on small phones */
+            flex-wrap: wrap; 
             justify-content: space-between;
             align-items: center;
             gap: 1rem;
@@ -36,13 +36,12 @@
             text-align: center;
         }
         
-        /* On very small screens, center everything */
         @media (max-width: 600px) {
             .header-container {
                 flex-direction: column;
                 justify-content: center;
             }
-            .text-4xl { font-size: 1.75rem; } /* Slightly smaller text for phones */
+            .text-4xl { font-size: 1.75rem; } 
         }
 
         /* Components */
@@ -50,9 +49,9 @@
         .rounded-lg { border-radius: 0.5rem; }
         .shadow-md { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         
-        /* Inputs & Buttons (STATIC) */
+        /* Inputs & Buttons */
         button { cursor: pointer; border: none; font-family: inherit; }
-        button:disabled { background-color: #9ca3af !important; cursor: not-allowed; }
+        button:disabled { background-color: #d1d5db !important; cursor: not-allowed; color: #6b7280; }
         select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; background: #fff; font-size: 1rem; }
 
         .btn-primary {
@@ -63,11 +62,21 @@
         .btn-primary:hover { background-color: #7c3aed; }
         .btn-primary:active { background-color: #6d28d9; }
 
+        /* Download Button Style */
+        .btn-success {
+            background-color: #10b981; color: white;
+            padding: 0.75rem 1.5rem; border-radius: 0.5rem;
+            font-weight: 600; width: 100%; font-size: 1rem;
+            margin-top: 1rem;
+        }
+        .btn-success:hover { background-color: #059669; }
+        .btn-success:disabled { background-color: #9ca3af; }
+
         .btn-secondary {
             background-color: #e9d5ff; color: #4c1d95;
             padding: 0.5rem 1rem; border-radius: 0.5rem;
             font-weight: 600; text-decoration: none; display: inline-block;
-            white-space: nowrap; /* Prevent button text wrapping */
+            white-space: nowrap; 
         }
         .btn-secondary:hover { background-color: #ddd6fe; }
 
@@ -107,7 +116,6 @@
             height: 12rem; overflow-y: auto; white-space: pre-wrap;
         }
         
-        /* Helper Flex classes for internal content */
         .flex-row-spaced { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
@@ -121,12 +129,13 @@
                 <p class="text-gray-500" style="margin-top: 0.5rem;">Visualize data, calibrated in real-time</p>
             </div>
             <div>
-                 <a href="/parameters.html" class="btn-secondary">Parameters</a>
+                 <a href="/parameters.html" class="btn-secondary">⚙️ Parameters</a>
             </div>
         </header>
 
         <main class="space-y-8">
             
+            <!-- Control -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl mb-4">Data Management</h2>
                 <div class="mb-4">
@@ -135,9 +144,11 @@
                         <option value="">-- Loading files... --</option>
                     </select>
                 </div>
-                <button id="loadBtn" onclick="loadChart()" class="btn-primary">Load & Visualize</button>
+                <button id="loadBtn" onclick="loadChart()" class="btn-primary">📈 Load & Visualize</button>
+                <button id="downloadBtn" onclick="downloadCSV()" class="btn-success" disabled>⬇️ Download CSV</button>
             </div>
 
+            <!-- Chart -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex-row-spaced mb-4">
                     <h2 class="text-xl">Visualization</h2>
@@ -155,6 +166,7 @@
                 </div>
             </div>
 
+            <!-- Debug -->
             <div id="debug-container" class="bg-white rounded-lg shadow-md p-6 debug-container"> 
                 <div class="flex-row-spaced mb-2">
                     <h3 class="text-xl">System Log</h3>
@@ -175,6 +187,7 @@
     const calibratedValues = [];
     let channelConfig = {};
     let isLoading = false;
+    let currentFilename = ""; // To store filename for download
 
     // --- UTILS ---
     function log(msg, isErr = false) {
@@ -208,6 +221,22 @@
             const res = await fetch('/config.json?t=' + Date.now());
             return res.ok ? (await res.json()).channels || [] : [];
         } catch (e) { return []; }
+    }
+
+    // Function to trigger file download
+    function downloadCSV() {
+        if (!currentFilename) return;
+        
+        // Remove leading slash if present
+        const cleanName = currentFilename.startsWith('/') ? currentFilename.substring(1) : currentFilename;
+        const downloadUrl = `/api/stream?file=${cleanName}`;
+        
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = cleanName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     window.addEventListener('load', async () => {
@@ -246,7 +275,12 @@
         if (!fname) return alert('Please select a file first.');
 
         isLoading = true;
+        currentFilename = fname; // Save for download button
+        
+        // Disable download button until loaded
         document.getElementById('loadBtn').disabled = true;
+        document.getElementById('downloadBtn').disabled = true;
+        
         timestamps.length = 0;
         calibratedValues.length = 0;
         
@@ -287,9 +321,10 @@
                 for (const line of lines) {
                     if (!line.trim() || line.includes('Year,Month')) continue; 
                     const cols = line.split(',');
-                    if (cols.length >= 8) {
-                        const t = `${cols[1]}/${cols[2]} ${cols[3]}:${cols[4]}:${cols[5]}.${cols[6]}`;
-                        const raw = parseFloat(cols[7]); 
+                    // CSV has 7 columns now (no Millisecond)
+                    if (cols.length >= 7) {
+                        const t = `${cols[1]}/${cols[2]} ${cols[3]}:${cols[4]}:${cols[5]}`;
+                        const raw = parseFloat(cols[6]); 
                         const scale = channelConfig.calibration_scale || 1.0;
                         const off = channelConfig.calibration_offset || 0.0;
                         
@@ -309,6 +344,9 @@
             updateChart();
             log(`Done. ${count} pts.`);
             showStatus(`Loaded ${count} values for ${channelConfig.name}`, 'info');
+            
+            // Enable download button now that loading is complete
+            document.getElementById('downloadBtn').disabled = false;
 
         } catch (err) {
             log(`Err: ${err.message}`, true);

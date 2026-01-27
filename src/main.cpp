@@ -8,7 +8,7 @@
  * @description
  * Multi-channel data acquisition system with:
  * - 4 independent ADC channels (configurable sampling rates)
- * - Real-time SD card logging with millisecond precision
+ * - Real-time SD card logging with seconds precision
  * - WiFi-based configuration and data download
  * - Automatic file rotation (dual-buffer system)
  * - System health monitoring (SD space, LED indicators)
@@ -44,9 +44,6 @@ TaskHandle_t MonitorTaskHandle = NULL;
 // Interrupt flags
 volatile bool uploadButtonPressed = false;
 volatile bool isSDFull = false;
-
-// Timing
-unsigned long bootMillis = 0;              // Boot timestamp for millisecond tracking
 
 // ADC data buffers
 uint16_t C1Data, C2Data, C3Data, C4Data;
@@ -161,10 +158,9 @@ void Channel1Task(void *parameter) {
             if(xSemaphoreTake(mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
                 C1Data = C1.Read();
                 now = rtc.now();
-                uint16_t millisecond = (millis() - bootMillis) % 1000;
                 
                 writeCSV(now.year(), now.month(), now.day(), now.hour(), 
-                        now.minute(), now.second(), millisecond, C1Data, 
+                        now.minute(), now.second(), C1Data, 
                         currentLogFiles[0], C1File);
                 
                 xSemaphoreGive(mutex);
@@ -196,10 +192,9 @@ void Channel2Task(void *parameter) {
             if(xSemaphoreTake(mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
                 C2Data = C2.Read();
                 now = rtc.now();
-                uint16_t millisecond = (millis() - bootMillis) % 1000;
                 
                 writeCSV(now.year(), now.month(), now.day(), now.hour(),
-                        now.minute(), now.second(), millisecond, C2Data,
+                        now.minute(), now.second(), C2Data,
                         currentLogFiles[1], C2File);
                 
                 xSemaphoreGive(mutex);
@@ -231,10 +226,9 @@ void Channel3Task(void *parameter) {
             if(xSemaphoreTake(mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
                 C3Data = C3.Read();
                 now = rtc.now();
-                uint16_t millisecond = (millis() - bootMillis) % 1000;
                 
                 writeCSV(now.year(), now.month(), now.day(), now.hour(),
-                        now.minute(), now.second(), millisecond, C3Data,
+                        now.minute(), now.second(), C3Data,
                         currentLogFiles[2], C3File);
                 
                 xSemaphoreGive(mutex);
@@ -266,10 +260,9 @@ void Channel4Task(void *parameter) {
             if(xSemaphoreTake(mutex, pdMS_TO_TICKS(50)) == pdTRUE) {
                 C4Data = C4.Read();
                 now = rtc.now();
-                uint16_t millisecond = (millis() - bootMillis) % 1000;
                 
                 writeCSV(now.year(), now.month(), now.day(), now.hour(),
-                        now.minute(), now.second(), millisecond, C4Data,
+                        now.minute(), now.second(), C4Data,
                         currentLogFiles[3], C4File);
                 
                 xSemaphoreGive(mutex);
@@ -367,7 +360,6 @@ void setup() {
     loadConfigFromLittleFS();
     setupWebRoutes();
     swapLoggingGroups();
-    bootMillis = millis();
     setCpuFrequencyMhz(CPU_FREQ_LOGGING);
 
     // Create mutex for SD card access

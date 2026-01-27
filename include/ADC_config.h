@@ -32,7 +32,7 @@ public:
     String name;                  // User-defined channel name
     bool enabled;                 // Enable/disable logging
     int resolution;               // ADC resolution (9-12 bits)
-    int samplingRate;             // Sampling interval in milliseconds
+    int samplingRate;             // Sampling interval in seconds
     String unit;                  // Measurement unit (V, A, °C, etc.)
     float calibration_offset;     // Calibration offset (added to result)
     float calibration_scale;      // Calibration scale (multiplied with raw)

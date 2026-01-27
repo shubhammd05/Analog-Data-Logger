@@ -97,18 +97,17 @@ bool checkSdCardSpace() {
  * @param H Hour (24-hour format)
  * @param Mi Minute
  * @param S Second
- * @param Ms Millisecond
  * @param DataValue Raw ADC value
  * @param myFile File reference (not used, kept for compatibility)
  * @param FileName Full path to CSV file
  */
 void writeCSV(uint16_t Y, uint8_t M, uint8_t D, uint8_t H, uint8_t Mi, 
-              uint8_t S, uint16_t Ms, uint16_t DataValue, File &myFile, String FileName) {
+              uint8_t S, uint16_t DataValue, File &myFile, String FileName) {
     File file = SD.open(FileName.c_str(), FILE_APPEND);
     
     if (file) {
-        // Format: Year,Month,Date,Hour,Minute,Second,Millisecond,Value
-        file.printf("%d,%d,%d,%d,%d,%d,%d,%d\n", Y, M, D, H, Mi, S, Ms, DataValue);
+        // Format: Year,Month,Date,Hour,Minute,Second,Value
+        file.printf("%d,%d,%d,%d,%d,%d,%d\n", Y, M, D, H, Mi, S, DataValue);
         file.close();
     } else {
         DEBUG_PRINTLN("Error opening file for writing.");
@@ -124,7 +123,7 @@ void writeCSVHeader(String FileName) {
     
     if (myFile) {
         if (myFile.size() == 0) {
-            myFile.println("Year,Month,Date,Hour,Minute,Second,Millisecond,Value");
+            myFile.println("Year,Month,Date,Hour,Minute,Second,Value");
         }
         myFile.close();
     }

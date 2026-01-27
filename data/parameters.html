@@ -122,12 +122,31 @@
             font-size: 0.85em;
             color: #92400e;
         }
+        .sync-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Device Parameters</h1>
         <p class="subtitle">Configure ADC channels, sampling rates, and calibration</p>
+
+        <!-- System Time Configuration -->
+        <div class="channel-box">
+            <h3>System Time</h3>
+            <div class="form-row">
+                <div>
+                    <label>Sync with Browser Time</label>
+                    <button type="button" class="btn sync-btn" onclick="syncTime()">Update Device Time</button>
+                    <small>Sets RTC to current browser time (seconds precision)</small>
+                </div>
+            </div>
+        </div>
 
         <form id="parameterForm">
             <!-- Channel 1 -->
@@ -359,6 +378,28 @@
     </div>
 
     <script>
+        // Time Sync Function
+        async function syncTime() {
+            try {
+                // Get current browser time in seconds (Unix timestamp)
+                const now = Math.floor(Date.now() / 1000);
+                
+                const res = await fetch('/api/set-time', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timestamp: now })
+                });
+                
+                if (res.ok) {
+                    alert('Time synchronized successfully!');
+                } else {
+                    alert('Failed to sync time.');
+                }
+            } catch (err) {
+                alert('Error connecting to device.');
+            }
+        }
+
         // Load existing config
         window.addEventListener('DOMContentLoaded', async () => {
             try {
