@@ -26,6 +26,12 @@
 #include "Config.h"
 
 // =============================================================================
+// EXTERNAL OBJECTS
+// =============================================================================
+// Allow access to the RTC defined in main.cpp
+extern RTC_DS3231 rtc;
+
+// =============================================================================
 // NETWORK CONFIGURATION
 // =============================================================================
 
@@ -266,7 +272,7 @@ void saveConfigToLittleFS() {
     // Add session metadata
     JsonObject session = doc.createNestedObject("session_info");
     session["device_id"] = "ESP32-Logger-001";
-    session["firmware_version"] = "2.0";
+    session["firmware_version"] = "1.0";
     
     File file = LittleFS.open("/config.json", FILE_WRITE);
     if (!file) {
@@ -503,6 +509,25 @@ void setupWebRoutes() {
         response->addHeader("Cache-Control", "no-cache");
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
+    });
+
+
+    // API to Set Time
+    server.on("/api/set-time", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL, 
+    [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+        StaticJsonDocument<256> doc;
+        deserializeJson(doc, data);
+        
+        if(doc.containsKey("timestamp")) {
+            unsigned long ts = doc["timestamp"];
+            // Adjust for timezone if needed, normally timestamp is UTC or local sent by browser
+            // Assuming browser sends its local time as epoch
+            rtc.adjust(DateTime(ts));
+            DEBUG_PRINTF("Time updated to: %lu\n", ts);
+            request->send(200, "application/json", "{\"status\":\"ok\"}");
+        } else {
+            request->send(400, "text/plain", "Invalid JSON");
+        }
     });
 
     // =========================================================================

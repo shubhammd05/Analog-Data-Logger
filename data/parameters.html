@@ -114,6 +114,13 @@
         .btn-secondary:hover {
             background: #4b5563;
         }
+        .sync-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            width: 100%;
+        }
         .helper {
             background: #fef3c7;
             border-left: 3px solid #f59e0b;
@@ -122,12 +129,109 @@
             font-size: 0.85em;
             color: #92400e;
         }
+        .separator {
+            margin: 20px 0;
+            border-top: 1px dashed #d1d5db;
+        }
+        .section-label {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+        .manual-hidden {
+            display: none;
+            margin-top: 20px;
+            border-top: 1px dashed #d1d5db;
+            padding-top: 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Device Parameters</h1>
         <p class="subtitle">Configure ADC channels, sampling rates, and calibration</p>
+
+        <!-- System Time Configuration -->
+        <div class="channel-box">
+            <h3>System Time Configuration</h3>
+            
+            <div class="form-row" style="align-items: center; justify-content: space-between;">
+                <div>
+                    <label style="margin-bottom: 0;">Device Clock</label>
+                    <small>Sync RTC with browser time or set manually.</small>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" class="btn sync-btn" style="width: auto;" onclick="syncTime()">Sync with Browser</button>
+                    <button type="button" class="btn btn-secondary" style="padding: 8px 12px;" onclick="toggleManualTime()" title="Manual Settings">▼</button>
+                </div>
+            </div>
+
+            <!-- Manual Entry Section (Hidden by Default) -->
+            <div id="manualTimeSection" class="manual-hidden">
+                <div class="section-label">Manual Entry</div>
+                
+                <!-- Date Input -->
+                <div class="form-row">
+                    <div>
+                        <label>Year</label>
+                        <input type="number" id="manYear" min="2025" max="2099" value="2026">
+                    </div>
+                    <div>
+                        <label>Month</label>
+                        <select id="manMonth">
+                            <option value="0">January</option>
+                            <option value="1">February</option>
+                            <option value="2">March</option>
+                            <option value="3">April</option>
+                            <option value="4">May</option>
+                            <option value="5">June</option>
+                            <option value="6">July</option>
+                            <option value="7">August</option>
+                            <option value="8">September</option>
+                            <option value="9">October</option>
+                            <option value="10">November</option>
+                            <option value="11">December</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Day</label>
+                        <input type="number" id="manDay" min="1" max="31" value="1">
+                    </div>
+                </div>
+
+                <!-- Time Input (Dropdowns) -->
+                <div class="form-row">
+                    <div>
+                        <label>Hour (0-23)</label>
+                        <select id="manHour">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label>Minute (0-59)</label>
+                        <select id="manMinute">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label>Second (0-59)</label>
+                        <select id="manSecond">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="setManualTime()">Set Manual Time</button>
+            </div>
+        </div>
 
         <form id="parameterForm">
             <!-- Channel 1 -->
@@ -137,19 +241,20 @@
                 <div class="form-row">
                     <div>
                         <label for="ch1name">Channel Name</label>
-                        <input type="text" id="ch1name" value="Channel_1" required>
+                        <input type="text" id="ch1name" value="Channel_1" maxlength="20" required>
                     </div>
                     <div>
                         <label for="ch1samplingRate">Sampling Rate (ms)</label>
-                        <input type="number" id="ch1samplingRate" min="1" value="1000" required>
+                        <input type="number" id="ch1samplingRate" min="10" max="3600000" value="1000" required>
+                        <small>Min: 10ms (100Hz)</small>
                     </div>
                     <div>
                         <label for="ch1resolution">Resolution</label>
                         <select id="ch1resolution" required>
-                            <option value="9">9-bit</option>
-                            <option value="10">10-bit</option>
-                            <option value="11">11-bit</option>
-                            <option value="12" selected>12-bit</option>
+                            <option value="9">9-bit (0-511)</option>
+                            <option value="10">10-bit (0-1023)</option>
+                            <option value="11">11-bit (0-2047)</option>
+                            <option value="12" selected>12-bit (0-4095)</option>
                         </select>
                     </div>
                     <div>
@@ -166,15 +271,15 @@
                 <div class="form-row">
                     <div>
                         <label for="ch1unit">Unit</label>
-                        <input type="text" id="ch1unit" value="raw">
+                        <input type="text" id="ch1unit" value="raw" maxlength="10">
                     </div>
                     <div>
                         <label for="ch1calibScale">Calibration Scale</label>
-                        <input type="number" id="ch1calibScale" step="0.000001" value="1.0">
+                        <input type="number" id="ch1calibScale" step="any" value="1.0">
                     </div>
                     <div>
                         <label for="ch1calibOffset">Calibration Offset</label>
-                        <input type="number" id="ch1calibOffset" step="0.01" value="0.0">
+                        <input type="number" id="ch1calibOffset" step="any" value="0.0">
                     </div>
                 </div>
 
@@ -195,19 +300,20 @@
                 <div class="form-row">
                     <div>
                         <label for="ch2name">Channel Name</label>
-                        <input type="text" id="ch2name" value="Channel_2" required>
+                        <input type="text" id="ch2name" value="Channel_2" maxlength="20" required>
                     </div>
                     <div>
                         <label for="ch2samplingRate">Sampling Rate (ms)</label>
-                        <input type="number" id="ch2samplingRate" min="1" value="1000" required>
+                        <input type="number" id="ch2samplingRate" min="10" max="3600000" value="1000" required>
+                        <small>Min: 10ms (100Hz)</small>
                     </div>
                     <div>
                         <label for="ch2resolution">Resolution</label>
                         <select id="ch2resolution" required>
-                            <option value="9">9-bit</option>
-                            <option value="10">10-bit</option>
-                            <option value="11">11-bit</option>
-                            <option value="12" selected>12-bit</option>
+                            <option value="9">9-bit (0-511)</option>
+                            <option value="10">10-bit (0-1023)</option>
+                            <option value="11">11-bit (0-2047)</option>
+                            <option value="12" selected>12-bit (0-4095)</option>
                         </select>
                     </div>
                     <div>
@@ -224,15 +330,15 @@
                 <div class="form-row">
                     <div>
                         <label for="ch2unit">Unit</label>
-                        <input type="text" id="ch2unit" value="raw">
+                        <input type="text" id="ch2unit" value="raw" maxlength="10">
                     </div>
                     <div>
                         <label for="ch2calibScale">Calibration Scale</label>
-                        <input type="number" id="ch2calibScale" step="0.000001" value="1.0">
+                        <input type="number" id="ch2calibScale" step="any" value="1.0">
                     </div>
                     <div>
                         <label for="ch2calibOffset">Calibration Offset</label>
-                        <input type="number" id="ch2calibOffset" step="0.01" value="0.0">
+                        <input type="number" id="ch2calibOffset" step="any" value="0.0">
                     </div>
                 </div>
 
@@ -249,19 +355,20 @@
                 <div class="form-row">
                     <div>
                         <label for="ch3name">Channel Name</label>
-                        <input type="text" id="ch3name" value="Channel_3" required>
+                        <input type="text" id="ch3name" value="Channel_3" maxlength="20" required>
                     </div>
                     <div>
                         <label for="ch3samplingRate">Sampling Rate (ms)</label>
-                        <input type="number" id="ch3samplingRate" min="1" value="1000" required>
+                        <input type="number" id="ch3samplingRate" min="10" max="3600000" value="1000" required>
+                        <small>Min: 10ms (100Hz)</small>
                     </div>
                     <div>
                         <label for="ch3resolution">Resolution</label>
                         <select id="ch3resolution" required>
-                            <option value="9">9-bit</option>
-                            <option value="10">10-bit</option>
-                            <option value="11">11-bit</option>
-                            <option value="12" selected>12-bit</option>
+                            <option value="9">9-bit (0-511)</option>
+                            <option value="10">10-bit (0-1023)</option>
+                            <option value="11">11-bit (0-2047)</option>
+                            <option value="12" selected>12-bit (0-4095)</option>
                         </select>
                     </div>
                     <div>
@@ -278,15 +385,15 @@
                 <div class="form-row">
                     <div>
                         <label for="ch3unit">Unit</label>
-                        <input type="text" id="ch3unit" value="raw">
+                        <input type="text" id="ch3unit" value="raw" maxlength="10">
                     </div>
                     <div>
                         <label for="ch3calibScale">Calibration Scale</label>
-                        <input type="number" id="ch3calibScale" step="0.000001" value="1.0">
+                        <input type="number" id="ch3calibScale" step="any" value="1.0">
                     </div>
                     <div>
                         <label for="ch3calibOffset">Calibration Offset</label>
-                        <input type="number" id="ch3calibOffset" step="0.01" value="0.0">
+                        <input type="number" id="ch3calibOffset" step="any" value="0.0">
                     </div>
                 </div>
 
@@ -303,19 +410,20 @@
                 <div class="form-row">
                     <div>
                         <label for="ch4name">Channel Name</label>
-                        <input type="text" id="ch4name" value="Channel_4" required>
+                        <input type="text" id="ch4name" value="Channel_4" maxlength="20" required>
                     </div>
                     <div>
                         <label for="ch4samplingRate">Sampling Rate (ms)</label>
-                        <input type="number" id="ch4samplingRate" min="1" value="1000" required>
+                        <input type="number" id="ch4samplingRate" min="10" max="3600000" value="1000" required>
+                        <small>Min: 10ms (100Hz)</small>
                     </div>
                     <div>
                         <label for="ch4resolution">Resolution</label>
                         <select id="ch4resolution" required>
-                            <option value="9">9-bit</option>
-                            <option value="10">10-bit</option>
-                            <option value="11">11-bit</option>
-                            <option value="12" selected>12-bit</option>
+                            <option value="9">9-bit (0-511)</option>
+                            <option value="10">10-bit (0-1023)</option>
+                            <option value="11">11-bit (0-2047)</option>
+                            <option value="12" selected>12-bit (0-4095)</option>
                         </select>
                     </div>
                     <div>
@@ -332,15 +440,15 @@
                 <div class="form-row">
                     <div>
                         <label for="ch4unit">Unit</label>
-                        <input type="text" id="ch4unit" value="raw">
+                        <input type="text" id="ch4unit" value="raw" maxlength="10">
                     </div>
                     <div>
                         <label for="ch4calibScale">Calibration Scale</label>
-                        <input type="number" id="ch4calibScale" step="0.000001" value="1.0">
+                        <input type="number" id="ch4calibScale" step="any" value="1.0">
                     </div>
                     <div>
                         <label for="ch4calibOffset">Calibration Offset</label>
-                        <input type="number" id="ch4calibOffset" step="0.01" value="0.0">
+                        <input type="number" id="ch4calibOffset" step="any" value="0.0">
                     </div>
                 </div>
 
@@ -359,8 +467,91 @@
     </div>
 
     <script>
-        // Load existing config
+        // Populate Time Dropdowns on Load
+        function initTimeDropdowns() {
+            const hSel = document.getElementById('manHour');
+            const mSel = document.getElementById('manMinute');
+            const sSel = document.getElementById('manSecond');
+            
+            // Populate Hours (0-23)
+            for(let i=0; i<24; i++) {
+                const opt = new Option(i.toString().padStart(2, '0'), i);
+                hSel.add(opt);
+            }
+            
+            // Populate Min/Sec (0-59)
+            for(let i=0; i<60; i++) {
+                const txt = i.toString().padStart(2, '0');
+                mSel.add(new Option(txt, i));
+                sSel.add(new Option(txt, i));
+            }
+            
+            // Set defaults to current time
+            const now = new Date();
+            document.getElementById('manYear').value = now.getFullYear();
+            document.getElementById('manMonth').value = now.getMonth();
+            document.getElementById('manDay').value = now.getDate();
+            hSel.value = now.getHours();
+            mSel.value = now.getMinutes();
+            sSel.value = 0;
+        }
+
+        // Toggle Manual Time Section
+        function toggleManualTime() {
+            const section = document.getElementById('manualTimeSection');
+            if (section.style.display === 'none' || getComputedStyle(section).display === 'none') {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        // Generic API call to set time
+        async function sendTime(timestamp) {
+            try {
+                const res = await fetch('/api/set-time', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timestamp: timestamp })
+                });
+                
+                if (res.ok) {
+                    alert('Device time updated successfully!');
+                } else {
+                    alert('Failed to update time.');
+                }
+            } catch (err) {
+                alert('Error connecting to device. Is AP active?');
+            }
+        }
+
+        // Option 1: Sync with Browser
+        async function syncTime() {
+            // Get current browser time in seconds (Unix timestamp)
+            const now = Math.floor(Date.now() / 1000);
+            await sendTime(now);
+        }
+
+        // Option 2: Manual Set
+        async function setManualTime() {
+            const year = parseInt(document.getElementById('manYear').value);
+            const month = parseInt(document.getElementById('manMonth').value); // 0-11
+            const day = parseInt(document.getElementById('manDay').value);
+            const hour = parseInt(document.getElementById('manHour').value);
+            const minute = parseInt(document.getElementById('manMinute').value);
+            const second = parseInt(document.getElementById('manSecond').value);
+            
+            // Create date object
+            const dt = new Date(year, month, day, hour, minute, second);
+            const ts = Math.floor(dt.getTime() / 1000);
+            
+            await sendTime(ts);
+        }
+
+        // Load existing config & Init Dropdowns
         window.addEventListener('DOMContentLoaded', async () => {
+            initTimeDropdowns(); // Init manual time controls
+            
             try {
                 const res = await fetch('/config.json');
                 const config = await res.json();
@@ -381,7 +572,7 @@
             }
         });
 
-        // Submit handler
+        // Submit handler for Parameters
         document.getElementById('parameterForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
