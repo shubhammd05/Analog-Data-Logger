@@ -90,6 +90,21 @@ bool checkSdCardSpace() {
 // =============================================================================
 
 /**
+ * @brief Write a pre-formatted string buffer to SD card (Burst Write)
+ * @param buffer String containing multiple CSV lines
+ * @param FileName Full path to CSV file
+ */
+void writeCSVBuffer(const String &buffer, String FileName) {
+    File file = SD.open(FileName.c_str(), FILE_APPEND);
+    if (file) {
+        file.print(buffer);
+        file.close();
+    } else {
+        DEBUG_PRINTLN("Error opening file for burst write.");
+    }
+}
+
+/**
  * @brief Write CSV data row to SD card
  * @param Y Year
  * @param M Month

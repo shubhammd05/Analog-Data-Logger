@@ -28,8 +28,12 @@
 #define CPU_FREQ_WIFI       240         // CPU frequency during WiFi (MHz)
 
 // Buffering & Power
+#define RESERVE_MEMORY      512
 #define QUEUE_SIZE          50          // Number of samples per channel queue
 #define BURST_WRITE_COUNT   10          // Samples to accumulate before writing to SD
+// Note: BURST_WRITE_COUNT should always <= QUEUE_SIZE, for best results, 50 %
+// Also you can even set it 1 (not lower than that), but we  will lose the point of including buffer
+// Incase of power loss, we will loose the samples in the buffer that are not yet written to SD
 #define LIGHT_SLEEP_EN      1           // Enable automatic light sleep
 
 // =============================================================================
